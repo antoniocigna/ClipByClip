@@ -60,7 +60,7 @@ Cartelle Utilizzate e Loro Contenuto
 
 
 | Tables        | Are           |
-| ------------- |:-------------:|
+| ------------- | -------------|
 | **ClipByClip.html**  | file costruttore (doppio clip per iniziare) | 
 | **scripts**   | cartella che contiene tutti gli script     |
 | **VideoAudio** | cartella che contiene i file video e audio |  
@@ -68,11 +68,3 @@ Cartelle Utilizzate e Loro Contenuto
 | **PLAYER**     |  cartella che contiene i file **player**   |
 |                |  es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html |
 
-
- --- | ---- 
-**ClipByClip.html** | file costruttore (doppio clip per iniziare)
-**scripts**   | cartella che contiene tutti gli script 
-**VideoAudio**| cartella che contiene i file video e audio   
-              | es. Sherlock Holmes in Dressed to Kill.mp4 
-**PLAYER**    | cartella che contiene i file **player**   
-              | es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html 
