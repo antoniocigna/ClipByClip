@@ -55,11 +55,10 @@ Scaricare il file video o audio, il file sottotitoli originali ed eventualmente 
 Per iniziare eseguire il file **ClipByClip.html**.
 
 
-Cartelle Utilizzate e Loro Contenuto
+File e Cartelle
 ------------------------------------
 
-
-| Tables        | Are           |
+| Nome          | Descrizione     |
 | ------------- | -------------|
 | **ClipByClip.html**  | file costruttore (doppio clip per iniziare) | 
 | **scripts**   | cartella che contiene tutti gli script     |
