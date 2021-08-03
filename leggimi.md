@@ -61,7 +61,7 @@ Cartelle Utilizzate e Loro Contenuto
 
 | Tables        | Are           | Cool  |
 | ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
+| **ClipByClip.html**  | file costruttore (doppio clip per iniziare) | $1600 |
 | col 2 is      | centered      |   $12 |
 | zebra stripes | are neat      |    $1 |
 
