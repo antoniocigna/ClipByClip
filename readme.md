@@ -61,36 +61,14 @@ Download the video or audio file, the original subtitle file and possibly the on
 
 To start, run the **ClipByClip.html** file.
 
-ClipByClip folders
-------------------
+Files and folders 
+-----------------
 
-**ClipByClip**
-
-folder which contains the whole application
-
-  
-
-**ClipByClip.html**
-
-the builder file (double click to run it)
-
- 
-
-**scripts**
-
-folder whith all the script files
-
- 
-
-**VideoAudio**
-
-folder with the video or audio files to play  
-eg. Sherlock Holmes in Dressed to Kill.mp4
-
- 
-
-**PLAYER**
-
-folder with the **player** files  
-eg. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html
-
+| Name          | Description    |
+| :------------- | :-------------|
+| **ClipByClip.html**  | the builder file (double click to run it) | 
+| **scripts**   | folder whith all the script files  |
+| **VideoAudio** | folder with the video or audio files to play |  
+|                | es. Sherlock Holmes in Dressed to Kill.mp4 |
+| **PLAYER**     | folder with the **player** files  |
+|                |  es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html |
