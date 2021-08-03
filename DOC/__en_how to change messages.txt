@@ -1,0 +1,59 @@
+All messages are handled by two scripts:
+	1) ClipByClip_builder_msg1_messages.jstxt
+	2) ClipByClip_builder_msg2_mger.jstxt
+
+To change the message text or add a new language just change the ClipByClip_builder_msg1_messages.jstxt script
+
+-------------------------------------------------- ----------
+ClipByClip_builder_msg1_messages.jstxt 
+--------------------------------------
+content:
+	// Italian
+	var msg_it = "(.000))" +
+	"(.700)) A tool to improve understanding of foreign languages" +
+	"(.701)) Create a file yourself ...
+	...
+	...
+	"(.873)) <small><small>Show/Hide</small> </small> <br> Subtitles" +
+	"";
+	// ------------------------------------------------ -------------
+	// English
+	var msg_en = "(.000))" +
+	"(.700)) A tool to improve foreign language comprehension" +
+	"(.701)) Create yourself an ...
+	...
+	...
+	...
+	"(.872)) magnify the screen" +
+	"(.873)) <small><small>Show/Hide</small> </small> <br> Subtitles" +
+	"";
+	// =============================================== ==========
+	var list_msg00 = [
+	["it", "<b> Italian </b> <br>", msg_it],
+	["en", "<b> English </b> <br>", msg_en]
+	];
+
+
+All messages in a language are found in a single variable whose name is formate by the constant 'msg_' and 2-letter language code.
+
+The msg_xx variable is made up of several lines, one for each message.
+	Each message is identified by a 3-digit number between '(.' And '))'. for example: (.701))
+
+	Each language is identified by an element of the 'list_msg00' list.
+	and each of these elements is in turn a list that consists of:
+		- 2-character language identifier (e.g. en)
+		- name of the language (English)
+		- name of the variable that contains all the messages of the language (e.g. msg_en)
+	eg. ["en", "<b>English</b><br>", msg_en]
+
+Each message with number nnn overlaps the text of the html file which has the identifier 'm' + nnn.
+(For example the text preceded by (.701)) overlaps the text with id = 'm701').
+
+To change the text of a message in the html file, just change the line with the same identifier in variable msg_xx where xx is the language code.
+
+To add a new language (e.g. French) simply create a new msg_xx variable (e.g. var msg_fr)
+	using the existing variables as a model and with the same identifiers,
+	and then add a new line in the 'list_msg00' variable. 
+	eg ["fr", <b>Français</b><br>", msg_fr]
+
+Pay attention to quotes and commas.

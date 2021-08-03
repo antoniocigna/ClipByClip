@@ -1,0 +1,68 @@
+Tutti i messaggi sono gestiti da due script:  
+	1) ClipByClip_builder_msg1_messages.jstxt
+	2) ClipByClip_builder_msg2_mger.jstxt
+
+Per variare il testo dei messaggi o aggiungere una nuova lingua 
+è sufficiente variare la script  ClipByClip_builder_msg1_messages.jstxt 	
+	
+------------------------------------------------------------
+Script ClipByClip_builder_msg1_messages.jstxt	
+	
+	contenuto: 
+		// Italiano
+		var msg_it = "(.000)) " +
+			"(.700)) Uno strumento per migliorare la comprensione delle lingue straniere" +
+			"(.701)) Crea tu stesso un file ...
+			...	
+			...
+			"(.873)) <small><small>Mostra/Nascondi</small></small><br>Sottotitoli" + 
+			"";
+		//-------------------------------------------------------------
+		// English
+		var msg_en = "(.000)) " +
+			"(.700)) A tool to improve foreign language comprehension" +
+			"(.701)) Create yourself an	...
+			...
+			...
+			...
+			"(.872)) magnify the screen" + 
+			"(.873)) <small><small>Show/Hide</small></small><br>Subtitles" + 
+			"";
+		// ==========================================================
+		var list_msg00 = [
+			["it", "<b>Italiano</b><br>", msg_it],
+			["en", "<b>English</b><br>", msg_en]
+			];
+
+		
+		Tutti i messaggi in una lingua si trovano in una sola variabile il cui nome è composto 
+		dalla costante 'msg_' e dal codice lingua di 2 lettere (es.  msg_en).  
+
+		La variabile msg_xx è composta da diverse righe una per ogni messaggio. 
+		Ogni message è identificato da un numero di 3 cifre compreso fra '(.'  e ')) '.   per es.   (.701))
+	 
+		Ogni lingua è identificata  da un elemento della lista 'list_msg00'. 	
+			e ognuno di questi elementi è a sua volta una lista che composta da:
+				- identificativo della lingua di 2 caratteri  ( es. en )
+				- nome in chiaro della lingua                 ( english ) 
+				- nome della variabile che contiene tutti i messaggi	della lingua (es. msg_en) 
+			es. ["en", "<b>English</b><br>", msg_en]
+				
+		Ogni messaggio con numero nnn si sovrappone al testo del file html che ha 
+		l'identificativo composto da 'm' + numero messaggio nnn. 
+		(Per esempio il testo preceduto da (.701)) va a sovrapporsi al testo con id='m701').
+		
+		Per variare il testo di un messaggio del file html è sufficiente modificare la riga 
+		con lo stesso identificativo della lingua desiderata. 
+
+		Per aggiungere una nuova lingua (es. francese)  è sufficiente creare una nuova variabile msg_xx   ( es. var msg_fr) 
+		usando come modello le varibili msg_xx esistenti e con gli stessi identificativi, 
+		e poi aggiungere la lista corrispondete alla variabile list_msg00
+				(es.  ["fr", <b>Français</b><br>", msg_fr]  )
+				
+		Attenzione agli apici e alle virgole. 
+
+		Nella pagina ClipByClip.html c'è un pulsante INFO che apre il file html con nome  ClipByClip_description_xx.html 
+		dove xx è l'identificativo della lingua. 
+		Per evitari errori nell'utilizzo di questo tasto bisogna creare anche questo file quando si aggiunge una nuova lingua.
+

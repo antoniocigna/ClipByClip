@@ -1,0 +1,257 @@
+"use strict";
+
+// Italiano
+var msg_it = "(.000)) " +
+    "(.700)) Uno strumento per migliorare la comprensione delle lingue straniere" +
+    "(.701)) Crea tu stesso un file html con cui riprodurre un file video o audio in clip,<br> ognuna con sottotitoli originali e tradotti a richiesta" +
+    "(.702)) quello che ti serve" +
+    "(.703)) Scrivi il titolo" +
+    "(.704)) Sottotitoli originali" +
+    "(.705)) Sottotitoli tradotti" +
+    "(.706)) Conferma" +	
+    "(.707)) incolla qui l'indirizzo completo della cartella che contiene il video <br>(non è necessario se è la stessa cartella che contiene questo file html)" +
+    "(.708)) path completo alla cartella video" +
+    "(.709)) Scegli il file Video o Audio" +
+    "(.710)) Premi per scaricare" +
+    "(.711)) Clip By Clip<br>" +
+    "(.712)) titolo" +
+	
+	"(.717)) Questa è l'area dei sottotitoli,  usa l'ancora per spostarla nella posizione preferita  " +
+			 "<small><br>(poni il mouse sull'ancora e tenendo il tasto schiacciato spostalo)</small>" +
+	"(.718)) Devi spostare il file scaricato dalla cartella dei download alla cartella <b>ClipByClip/PLAYER</b>" + 
+    "(.720)) manca il titolo" +
+    "(.721)) il file dei sottotitoli originali non è stato ancora letto oppure è vuoto" +
+    "(.723)) Seleziona uno o più file." +
+    "(.724)) errore1 nel passaggio precedente: riga in formato senza aspetti in extract_time(" +
+    "(.725)) errore2 nel passaggio precedente: riga in formato senza aspetti in extract_time(" +
+    "(.726)) errore3 in extract_time() " +
+    "(.727)) Riproduci fino alla fine" +
+    "(.730)) secondi senza dialogo" +
+    "(.731)) Scarica" +    
+    "(.750)) Seleziona uno o più file." +
+	"(.752)) non può essere riprodotto" +
+	"(.753)) puoi selezionare solo un file che si trova nella cartella <br> <b>ClipByClip/VideoAudio</b>" +
+	"(.754)) copia il file video o audio in questa cartella  e riprova" +
+	"(.755)) Controlla se il percorso è corretto: " +
+    "(.760)) una cartella" +
+    "(.761)) crea una nuova cartella (possiamo chiamarla <b>ClipByClip</b>)" +
+    "(.762)) Copia questo file html in questa cartella." +
+    "(.763)) un titolo" +
+    "(.764)) specificalo qui sotto, sarà la parte principale del nome del file che costruisci" +
+    "(.765)) il file video o audio" +
+    "(.766)) può stare sul web o sul tuo disco, in quest'ultimo caso DEVI copiarlo nella cartella <b>ClipByClip</b>." +
+    "(.767)) devi specificare il suo indirizzo web o se sul disco, il suo nome nella cartella <b>ClipByClip</b>." +
+    "(.768)) il file dei sottotitoli in lingua originale" +
+    "(.769)) deve stare nel tuo disco (potrebbe stare nella cartella <b>ClipByClip</b> ma non è necessario)" +
+    "(.770)) il file dei sottotitoli tradotti" +
+    "(.771)) se non hai bisogno di una traduzione, puoi ignorarlo. " +
+    "(.772)) Puoi ottenere questo file traducendo l'originale utilizzando un traduttore automatico (es. Google, Bing) " +
+    "(.773)) Nota:" +
+    "(.774)) Sia Google che Bing hanno un limite di lunghezza del testo." +
+    "(.775)) Google ha un limite di 5000 byte, mostra i primi 5000 quindi chiede di continuare con un altro pezzo di 5000 byte." +
+    "(.776)) Google consente superare questo limite fino a 5 volte, se viene passato come input un file di testo " +
+			 " (premere il pulsante <b>Documenti</b> che si trova a sinistra sopra la casella del testo da tradurre," +
+    "(.777)) Attenzione non accetta file srt, bisogna rinominare l'estensione del file da .srt a .txt" +	
+	"(.780)) Mostra" +	
+	"(.781)) Nascondi" +	
+	"(.782)) Sottotitoli originali" +	
+	"(.783)) Sottotitoli tradotti" +	
+	"(.784)) Sottotitoli" +	
+	"(.801)) Ogni pezzettino del file della durata desiderata anche di 1 secondo," +
+    "(.802)) può essere visto o ascoltato più e più volte prima di richiederne prima i sottotitoli in lingua originale e poi quelli tradotti." +
+    "(.803)) E' possibile inserire col cursore al minuto e secondo desiderato e poi avanti e indietro di un sedino er volta." +
+    "(.804)) E' possibile saltare i pezzi senza dialogo." +
+    "(.805)) I file sottotitoli devono essere di tipo <b>srt</b>, sono utilizzabili anche i sottotitoli inseriti direttamente nel video (hardcoded)." + 
+	"(.806)) quello che ti serve" +	
+	"(.807)) oppure" +  
+    "(.810)) I file video o audio da riprodurre devono trovarsi nella cartella <b>ClipByClip/VideoAudio</b>" +
+    "(.811)) Seleziona un file Video o Audio" +
+    "(.812)) VIDEO o File audio" +
+    "(.813)) Seleziona un'altro file Video o Audio nella cartella <b>ClipByClip/VideoAudio</b>" +
+    "(.814)) Conferma" +
+    "(.815)) Conferma" +
+    "(.816)) Dove sono i sottotitoli in lingua originale?" +
+    "(.817)) I sottotitoli sono codificati all'interno del video" +
+    "(.818)) I sottotitoli sono in un altro file" +
+    "(.819)) Continua" +
+    "(.820)) nome file scritto" +
+    "(.821)) finale" +
+	"(.822)) per migliorare la comprensione di ascolto e lettura di una lingua straniera" + 
+	"(.823)) per migliorare la comprensione di ascolto e lettura di una lingua straniera" + 
+    "(.824)) Clicca quì sotto per andare<br><b>indietro</b>" +
+    "(.825)) di" +
+    "(.826)) righe" +
+    "(.827)) di sottotitoli" +
+    "(.828)) oppure" +
+    "(.829)) di" +    
+    "(.831)) secondi" +
+    "(.832)) Ripeti" +
+    "(.834)) Clicca quì sotto per andare<br><b>avanti</b>" +
+    "(.836)) di" + 
+    "(.837)) righe <br><small><small> di sottotitoli</small></small>" +
+    "(.839)) oppure" +
+    "(.840)) di" +
+    "(.841)) secondi" +
+    "(.842)) Premi i pulsanti a sinistra<br>per leggere<br>qui <br>i sottotitoli originali e tradotti" +
+    "(.843)) Questa striscia serve per nascondere i sottotitoli</small>" +
+    "(.844)) Per spostarla trascina la parte superiore" +
+    "(.845)) Per modificarne l'ampiezza trascina l'angolo in basso a destra" +
+    "(.846)) Salta" +
+    "(.850)) Errore<br>il file non è un video e neppure un audio" +
+    "(.851)) manca il nome del file video" +
+    "(.852)) puoi selezionare solo un file che si trova nella cartella <br> <b>ClipByClip/VideoAudio</b>" +
+    "(.853)) copia il file video o audio in questa cartella e riprova <br>" +
+    "(.854)) L'indirizzo della cartella non è stato specificato" +
+    "(.855)) Seleziona di nuovo il file e ricordati di inserire l'indirizzo completo della cartella" +
+    "(.857)) il file di testo tradotto non è stato letto o è vuoto" +
+    "(.858)) La costruzione dei file è terminata" +
+    "(.859)) sposta il file scaricato dalla cartella dei download alla cartella <b>ClipByClip/PLAYER</b>" +
+    "(.860)) La cartella <b>ClipByClip</b> deve contenere" +
+    "(.861)) Cartella" +
+    "(.862)) il file da eseguire" +
+    "(.863)) file da riprodurre" +
+    "(.864)) non è un testo" +
+    "(.865)) non è un file di testo" +
+    "(.866)) tutte le istruzioni dello script devono essere insieme e prima dell'istruzione </head>" +
+	"(.867)) Specifica i file sottotitoli da utilizzare e quindi clicca quì sotto per scaricare il file " +	
+	"(.868)) Specifica i file sottotitoli da utilizzare e quindi clicca quì sotto per scaricare il file " +		
+	"(.869)) clicca quì per spostare il tempo dei sottotitoli di " + 
+	"(.870)) secondi" + 
+	"(.871)) codificati nel file video" + 
+	"(.872)) ingrandisci lo schermo" + 
+	"(.873)) <small><small>Mostra/Nascondi</small></small><br>Sottotitoli" + 
+    "";
+//-------------------------------------------------------------
+// English
+var msg_en = "(.000)) " +
+    "(.700)) A tool to improve foreign language comprehension" +
+	"(.701)) Create yourself an html file with which you can play a video or audio file in clips, <br> each one with original and translated subtitles on demand" +
+    "(.702)) what you need" +
+    "(.703)) Write the title" +
+    "(.704)) Source Language Subtitles" +
+    "(.705)) Translated Subtitles" +
+    "(.706)) Confirm" +
+	"(.707)) paste here the complete address of the folder containing the video <br>(it isn't necessary if it is the same folder which contains this html file)" +
+    "(.708)) full path to the video folder" +
+    "(.709)) Choose the Video or Audio file" +
+    "(.710)) Press to download" +
+    "(.711)) Play and learn Clip by Clip<br>" +
+    "(.712)) title" +    
+	"(.717)) This is the subtitles area,  use the anchor to move it to where you prefer" +
+			 "<small><br>(put the mouse over the anchor and keeping the button pressed, move it)</small>" +
+	"(.718)) You must move the downloaded file from download folder to the <b>ClipByClip/PLAYER</b> folder" + 
+    "(.720)) title is missing" +
+    "(.721)) the source language subtitle file  has not been read yet or it is empty" +
+    "(.723)) Select one or more files." +
+    "(.724)) error1 in the previous step: line in unaspected format in extract_time(" +
+    "(.725)) error2 in the previous step: line in unaspected format in  extract_time(" +
+    "(.726)) error3 in extract_time() " +
+    "(.727)) Play until the End" +
+    "(.730)) seconds no dialog" +
+    "(.731)) Download" +   
+    "(.750)) Select one or more files." +
+	"(.752)) can't be played" +
+	"(.753)) you can select only a file which is in the<br>  <b>ClipByClip/VideoAudio</b> folder" + 
+	"(.754)) copy the video or audio file in this folderand try again" +	
+	"(.755)) Check if the path is right: " +
+    "(.760)) a folder" +  
+    "(.761)) create a new folder (we may call it <b>ClipByClip</b>)" + 
+    "(.762)) Copy this html file in this folder." +   
+    "(.763)) a title" +
+    "(.764)) specify it here below, it will be the main part of the name of the file you build" + 
+    "(.765)) the video or audio file" + 
+    "(.766)) it can be on the web or in your disk, in this latter case you MUST copy it in the <b>ClipByClip</b> folder." + 
+    "(.767)) you must specify its the web address or if on the disk, its name in <b>ClipByClip</b> folder." + 
+    "(.768)) the subtitle in source language file" +
+    "(.769)) it must be in your local disk (it's better be in <b>ClipByClip</b> folder but it isn't necessary)" +
+    "(.770)) the subtitle in translated language file" +
+    "(.771)) if you don't need translation, you can ignore it. " + 
+    "(.772)) You can obtain it by translating the original by using an automatic translator (e.g. Google, Bing) " +
+    "(.773)) Note:" + 
+    "(.774)) Both Google and Bing have a text length limit." +
+    "(.775)) Google has 5000 byte limit,   it shows the first 5000 then ask to continue with another 5000 byte piece." +   
+    "(.776)) Google allows yet to reach 5 times this limit if you pass a text file as input (press the <b>Documents</b> button which is on the left above the input text box)," + 
+    "(.777)) pay attention, it doesn't accept srt file, you need to rename the file extension from .srt to .txt" +  
+	"(.780)) Show" +	
+	"(.781)) Hide" +	
+	"(.782)) Original Subtitles" +	
+	"(.783)) Translated Subtitles" +	
+	"(.784)) Subtitles" +	
+	"(.801)) Each piece of the file with a desired length of up to 1 second," +
+    "(.802)) can be seen or heard over and over again before asking for the original subtitles first and then the translated subtitles." +
+    "(.803)) It is possible to move with the cursor to the desired minute and second and then move back and forth by one piece at a time." +
+    "(.804)) It is possible to skip pieces without dialogue." +
+    "(.805)) Subtitle files must be of type <b>srt</b>, subtitles inserted directly into the video (hardcoded) can also be used." + 
+	"(.806)) what you need" +	
+	"(.807)) or" +  
+	"(.810)) Video or audio file to be played must be inside the <b>ClipByClip/VideoAudio</b> folder" +
+	"(.811)) Select a Video or Audio file" +
+    "(.812)) VIDEO or Audio file" +
+    "(.813)) Select another Video or Audio file in the <b> ClipByClip/VideoAudio</b> folder" +
+    "(.814)) Confirm" +
+    "(.815)) Confirm" +
+    "(.816)) Where are the source language subtitles?" +
+    "(.817)) The subtitles are hard coded inside the video" +
+    "(.818)) The subtitles are in another file" +
+    "(.819)) Continue" +
+    "(.820)) file name written" +
+    "(.821)) final" +
+    "(.822)) to improve your listening and reading comprehension of a foreign language" +
+	"(.823)) to improve your listening and reading comprehension of a foreign language" +
+    "(.824)) Click below to go<br><b>back</b>" +
+    "(.825)) " +
+    "(.826)) lines" +
+    "(.827)) of subtitles" +
+    "(.828)) or" +
+    "(.829)) seconds" +
+    "(.830)) click here to skip the subtitle time by" +
+    "(.831)) seconds" +
+    "(.832)) Replay" +
+    "(.834)) Click below to go<br><b>forward</b>" +
+    "(.836)) " + 
+    "(.837)) lines <br> <small> <small> of subtitles </small> </small>" +
+    "(.839)) or" +
+    "(.840)) " +
+    "(.841)) seconds" +
+    "(.842)) Press the buttons on the left <br> to read <br> here <br> the original and translated subtitles" +	
+	"(.843)) This strip is here to hide the subtitles</small>" +
+    "(.844)) To move it, drag the upper part." +
+    "(.845)) To change its height, drag the bottom right corner." +
+    "(.846)) Skip" +
+    "(.850)) Error <br>the file is neither video nor audio" +
+    "(.851)) video file name is missing" +
+    "(.852)) you can only select a file located in the <b> ClipByClip/VideoAudio</b> folder" +
+    "(.853)) copy the video or audio file to this folder and try again <br> "+
+    "(.854)) (.853) The folder address has not been specified "+
+    "(.855)) Select the file again and remember to enter the full address of the folder " +
+    "(.857)) the translated text file has not been read or is empty" +
+    "(.858)) The construction of the files is finished" +
+    "(.859)) move the downloaded file from the downloads folder to the <b> ClipByClip/PLAYER</b> folder" +
+    "(.860)) The <b>ClipByClip</b> folder must contain" +
+    "(.861)) Folder" +
+    "(.862)) the file to be executed" + 
+    "(.863)) file to be played" +
+    "(.864)) is not a text" +
+    "(.865)) is not a text file" +
+    "(.866)) all script statement must be together and before the </head> statement" +
+	"(.867)) select the subtitles files and then click here below to download the file " +		
+	"(.868)) select the subtitles files and then click here below to download the file " +		
+	"(.869)) click here to shift the time of subtitles " + 
+	"(.870)) seconds" + 
+	"(.871)) hard coded inside the video file" + 	
+	"(.872)) magnify the screen" + 
+	"(.873)) <small><small>Show/Hide</small></small><br>Subtitles" + 
+    "";
+// ==========================================================
+var list_msg00 = [
+    ["it", "<b>Italiano</b><br>", msg_it],
+    ["en", "<b>English</b><br>", msg_en]
+];
+
+//======================================================================
+
+
+
+
+
+

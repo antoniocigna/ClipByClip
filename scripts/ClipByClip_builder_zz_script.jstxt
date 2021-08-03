@@ -1,0 +1,1637 @@
+"use strict";
+
+var DEBUG = false;  // if true display range of time in the subtitle strings 
+var wScreen = screen.availWidth  ;
+var hScreen = screen.availHeight ; 
+var video_native_height;
+var video_native_width;
+
+var VIDEO_HEIGHT_PERCENTAGE = 35/100;    // video height percentage over the screen height  
+var script_lev2_str = "";
+var script_lev2_fn = "";
+var script_player_line = "";
+var SILENT_GAP_LIMIT = 10; // > 0    
+var videoaudioTYPE = ""; 
+var out_html_file = "";
+
+var swTranslate = true;
+
+var src_var = "";
+
+var sw_video_ok = false;
+var sw_sub_ok   = false;
+var sw_title_ok = false; 
+
+var sw_ready_to_write = false;
+var separeX = "§";
+var HTML_TITLE = "";
+
+var path1;
+
+var PLAYER = "Player<br>";
+var sayNODIALOG = "-NODIA-";
+var num = 1;
+
+//-------------------------------------------------------	
+
+// var lev2 
+var path1 = window.location.pathname;
+var f1 = path1.lastIndexOf("/");
+var f2 = path1.lastIndexOf("\\");
+var f3 = -1;
+var barra = "/";
+if (f1 > f2) {
+        f3 = f1;
+        barra = "/";
+} else {
+        f3 = f2;
+        barra = "\\";
+}
+
+var id_next_secs_value = 10;
+var id_prev_secs_value = 10;
+
+var lastClipTimeBegin = 0;
+var lastClipTimeEnd = 0;
+
+var sw_play_step = false;
+var sw_jump = false;
+var vid;
+var timeStampList = [];
+var fromTimeList = [];
+var toTimeList = [];
+var origTextList = [];
+var tradTextList = [];
+
+var subFillerElem2 = document.getElementById("id_sub_filler");
+var subOrigElem2 = document.getElementById("subOrigText2");
+var subTradElem2 = document.getElementById("subTradText2");
+var subSilentElem2 = document.getElementById("subOrigSilent");
+var list_elemSub = [subOrigElem2, subTradElem2];
+
+var origFromTimeList = [];
+var origToTimeList = [];
+var origTextList = [];
+
+var tranFromTimeList = [];
+var tranToTimeList = [];
+var tranTextList = [];
+
+var list_time = [];
+
+var video_filename = ""; 
+var video_filetype = ""; 
+var video_filesize = "";
+var video_fileerror= false; 	
+
+
+
+var video_path     = "";
+var video_src      = ""; 
+
+
+
+var isPlaying = false;
+
+	 
+//    this is in inline script ==> var SECOND_LEVEL = false; 
+
+var righe_lang;
+
+
+if ( SECOND_LEVEL == false ) {
+        righe_lang = build_language_list();
+        var html_elemLingua = document.getElementById("id_ch_lang");
+        html_elemLingua.innerHTML = righe_lang;
+
+        h1_getAllMsgInLang_xx(myLang);
+		//document.getElementById("id_iframe").src = "ClipByClip_description_" + myLang + ".html"
+}
+
+
+if ( SECOND_LEVEL ) {
+        ready_to_be_played();
+        //leggi_cont_pre();
+        get_orig_tran_text();
+}
+
+//document.getElementById("id_video1").onerror="h1_onerrVideoFile(this)" ;
+
+//------------------------------------------------
+var video_file_ret = [] ; 
+var loadedfile_video = [];
+var loadedfile_srt1  = [];
+var loadedfile_srt2  = [];
+
+//get_file_mime_type("id_file1video" , loadedfile_video) ;
+get_file_mime_type("filetesto1"    , loadedfile_srt1 ) ;
+get_file_mime_type("filetesto2"    , loadedfile_srt2 ) ;
+
+var HARD_subtitle = false; 
+var HARDCODED = "HARDCODED"; 
+
+
+//-------------------------------------------------
+function set_msg_no_std_id() {
+        function innherHTML_to_from(to_id, from_id) {
+                document.getElementById(to_id).innerHTML = document.getElementById(from_id).innerHTML;
+        }
+
+        innerHTML_to_from("match1"        , "m706" );
+        //innerHTML_to_from("write1"        , "m710" );
+        innerHTML_to_from("id_titolo"     , "m712" );
+        innerHTML_to_from("id_sub_filler" , "m717" );
+
+        //document.getElementById("id_pathVideo").placeholder = document.getElementById('m708').innerHTML; // paste the video path here         
+}
+
+//----------------------------------------
+function from_secs_to_hh_mm_ss(time1) {
+        var time2 = time1.toFixed(0);
+        var secsH = time2 % 3600;
+        var hh = (time2 - secsH) / 3600;
+        var secsM = secsH % 60;
+        var mm = (secsH - secsM) / 60;
+        var ret1 = "";
+        if (hh > 0) {
+                ret1 = (100 + 1 * hh).toString().substring(1) + ":";
+        }
+        ret1 += ((100 + 1 * mm)).toString().substring(1) + ":" + (100 + 1 *
+                secsM).toString().substring(1);
+        return ret1;
+}
+//---------------------------------------
+function get_srt_data(srt_text) {
+        var out_text = "";
+        var maxtime = 0;
+        var tot_durata = 0;
+        var tot_num = 0;
+        var avg_durata = 0;
+        var max_durata = 0;
+        var passo = 10;
+        /* 
+        from array of srt lines
+        built an array of lines
+        one line for each group:
+        group id, from time to time, duration, text
+         */
+        /* 
+           examples of srt group
+           14
+           00:01:08,000 --> 00:01:10,000      ixtime[13] = 52
+           one line of text
+           other lines of text
+         
+           15
+           00:01:10,000 --> 00:01:15,000      ixtime[14] = 57
+           lines
+           of texts
+        	*/
+        //----------------------------------------------
+        var lis_from = [],
+                lis_secs_from = [],
+                lis_secs_to = [],
+                lis_text = [];
+
+        return each_group_to_a_line2(srt_text);
+
+        // ---------------- 
+
+        //----------------------------------------------------------
+        function norm_1time(line1) {
+                var line1t = line1.split(":");
+                if (line1t.length != 3) {
+                        return "";
+                }
+                var tm0 = "00" + line1t[0].trim();
+                var tm0x = tm0.substring(tm0.length - 2);
+                var tm1 = "00" + line1t[1].trim();
+                var tm1x = tm1.substring(tm1.length - 2);
+
+                var tm2ss = line1t[2].trim().replace(".", ",").split(","); // a volte invece della virgola trovo il punto (traduz. automatica google)
+
+                if (tm2ss.length != 2) {
+                        return "";
+                }
+                var tm2 = "00" + tm2ss[0].trim();
+                var tm2x = tm2.substring(tm2.length - 2);
+                var tm2virgola = tm2ss[1].trim().split(" ")[0];
+                var tm2virgola2 = (tm2virgola + "000").substring(0, 3);
+                return tm0x + ":" + tm1x + ":" + tm2x + "," + tm2virgola2;
+        }
+
+        function normalize_time(line) {
+                //line =00:00:00,000 --> 00:00:04,000	
+                // needed in case of errors introduced by automatic translation  
+
+                if (line.indexOf(":") < 0) {
+                        return "";
+                }
+                if (line.indexOf(">") < 0) {
+                        return "";
+                }
+
+                var lineP = line.split(">");
+                if (lineP.length != 2) {
+                        return "";
+                }
+
+                var line1 = norm_1time(lineP[0]);
+                if (line1 == "") {
+                        return "";
+                }
+
+                var line2 = norm_1time(lineP[1]);
+                if (line2 == "") {
+                        return "";
+                }
+
+                return line1 + " --> " + line2;
+        }
+        //---  end of normlize_time() -------------------------
+
+        //-----------------------------------------
+        function each_group_to_a_line2(srt_text) {
+                var out_text = "";
+                var lines = srt_text.split("\n");
+                var nlines = lines.length;
+                var i;
+                lines.push("9999999"); // beyond the end
+                var ixtimeline = []; // list of index of timeline in array lines
+
+                for (i = 0; i < nlines; i++) {
+                        var line = lines[i].replaceAll('\r', '').replaceAll('\n', '').trim();
+                        var norm_timeline = normalize_time(line);
+                        if (norm_timeline == "") { // not  a time line 
+                                lines[i] = line.trim();
+                                continue;
+                        }
+                        lines[i] = norm_timeline;
+
+                        ixtimeline.push(i);
+                }
+                ixtimeline.push(-1);
+
+                //-------------------------------------;
+                var numgrup = 0;
+                for (var ixx = 0; ixx < ixtimeline.length; ixx++) {
+                        i = ixtimeline[ixx];
+                        if (i < 0) {
+                                break;
+                        }
+
+                        var timeline = lines[i];
+                        var inext = ixtimeline[ixx + 1];
+
+                        var fromtime = timeline.substring(0, 12).replaceAll(',', '.');
+                        var totime = timeline.substring(17, 29).replaceAll(',', '.');
+
+                        var srt_secs_from = get_secs_from_timestamp2(fromtime);
+                        var srt_secs_to = get_secs_from_timestamp2(totime);
+
+                        var text1 = '';
+                        if (inext < 0) {
+                                inext = nlines;
+                        }
+                        for (var i2 = i + 1; i2 < (inext - 1); i2++) {
+                                text1 += lines[i2] + ' ';
+                        }
+
+                        text1 = text1.trim();
+
+                        if (text1 == '') {
+                                continue;
+                        }
+
+                        var outline1 = srt_secs_from + ":" + srt_secs_to + ":: " + text1.trim();
+
+                        out_text += outline1 + "\n";
+                }
+                return out_text;
+                /*
+                avg_durata = (tot_durata / tot_num).toFixed(1); 
+                //passo = ((1*avg_durata + max_durata)/2).toFixed(0); 
+                passo = Math.ceil( 1 ) ; 
+                console.log("maxtime=" + maxtime + "    num=" + tot_num + " avg=" + avg_durata + 
+                	"\n max_durata=" + max_durata+ "   passo=" + passo   + 
+                	"\n  len lis_text=" + lis_text.length  + "   len lis_from. = " +lis_from.length +"   len lis_secs_from. = " +lis_secs_from.length )  
+                */
+        } //-------- end of each_group_to_a_line() -----------------------
+        //------------------
+
+        //------------------------------------------
+        function get_secs_from_timestamp2(timestamp1) {
+                var hhmmss = timestamp1.trim().replaceAll(": ", ":");
+
+                var hh = hhmmss.substring(0, 2);
+                var mm = hhmmss.substring(3, 5);
+                var ssmmm = hhmmss.substring(6, 12);
+                //mmm = hhmmss.substring(9, 12);
+                var seconds = hh * 3600 + mm * 60 + parseFloat(ssmmm);
+                return fmt_secs(seconds, 5, 3);
+        }
+
+       
+        //---------------------------------------------------------
+        function discrete_time() {
+
+                /*
+                a volte (es. nei film) più gruppi srt appaiono nello stesso momento 
+                	si vede dal fatto che l'inizio di un gruppo precede la fine del gruppo precedente
+                non succede se parla uno speaker per volta (es. telegiornali )  
+                */
+                /*
+                questa funzione crea una lista dei secondi
+                	e per ognuno tiene traccia di tutti i gruppi srt in funzione in quel momento	
+                */
+
+                var tmax = Math.ceil(maxtime / passo); // maximum duration (seconds) of a clip 
+
+                var list_grp_second = []; // lista dei gruppi secondi ( ogni elemento si riferisce ad un range di secondi es. 0-5, 5-10, 10,11 ) 
+                // ogni elemento dovrà contenere la lista dei gruppi srt che appaiono nei secondi del gruppo
+                //  es.  grp srt 1,2,3 nel grppo secondi 0, 2,3,4,5 nel gruppo secondi 1,2 	
+                for (var t1 = 0; t1 < tmax; t1++) {
+                        list_grp_second[t1] = "";
+                }
+                //console.log("discrete1");
+                var srt_secs_from;
+                var srt_secs_to;
+                var num_ent = lis_from.length;
+                var xt, xt1, xt2;
+                for (var g = 0; g < num_ent; g++) {
+                        srt_secs_from = lis_secs_from[g];
+                        srt_secs_to = lis_secs_to[g];
+                        xt1 = Math.floor(srt_secs_from / passo);
+                        xt2 = Math.ceil(srt_secs_to / passo);
+                        for (xt = xt1; xt <= xt2; xt++) {
+                                list_grp_second[xt] += g + " "; // informa il secondo xt che esiste il gruppo srt g   
+                        }
+                } // end of for g
+
+                //console.log( "tmax="+tmax); 
+                var out_text = "";
+                var lis1;
+                var tt, t2, jg;
+                var fromtime, text1, text;
+                var outline1;
+                for (t1 = 0; t1 < tmax; t1++) {
+                        lis1 = list_grp_second[t1].trim();
+                        if (lis1 == "") {
+                                continue;
+                        }
+                        tt = lis1.split(" "); // lista dei gruppi srt che appaiono nei secondi del gruppo t1 
+                        //console.log("t1="+t1 + " tt=" + tt)  ;
+
+                        //console.log("")  ;
+                        for (t2 = 0; t2 < tt.length; tt) {
+                                jg = 1 * tt[t2];
+                                fromtime = lis_from[jg];
+                                text1 = lis_text[jg];
+                                srt_secs_from = lis_secs_from[jg];
+                                srt_secs_to = lis_secs_to[jg];
+                                //outline1 = fromtime + " (" + form53(srt_secs_from) + ") (" + form53(srt_secs_to) + ")  " + text1;
+                                //console.log(outline1);
+                                outline1 = fromtime + " (" + srt_secs_from + ") (" + srt_secs_to + ")  " +
+                                        text.trim();
+                                //out_text += "debug ==>" + outline1 + "<===\n"
+                                //out_text += outline1 + add_words( outline1 ) + "\n"
+                                out_text += outline1 + "\n";
+                        }
+
+                }
+                return out_text;
+        } // end of discrete_time
+
+        //-------------------------------------------------------
+        function form53(num) {
+                var num1 = "                                " + num.toFixed(3);
+
+                return num1.substring(num1.length - 8);
+        }
+
+        //------------------------------------
+        function overlapping_voices() {
+                var num_ent = lis_from.length;
+                for (var g = 0; g < num_ent; g++) {
+                        //var fromtime = lis_from[g];
+                        var srt_secs_from = lis_secs_from[g];
+                        var srt_secs_to = lis_secs_to[g];
+                        var text1 = lis_text[g];
+                        var pre_lines = "";
+                        var next_lines = "";
+                        for (var jp = 0; jp < g; jp++) {
+                                if (srt_secs_from > lis_secs_to[jp]) {
+                                        continue;
+                                }
+                                pre_lines += "p " + jp + " " + lis_from[jp] + " " + lis_text[jp] + "<br>";
+                        }
+                        for (var jn = g + 1; jn < num_ent; jn++) {
+                                if (srt_secs_to < lis_secs_from[jn]) {
+                                        break;
+                                }
+                                next_lines += "<br>N " + jn + " " + lis_from[jn] + " " + lis_text[jn];
+                        }
+                        var text2 = pre_lines + "<br>x " + g + " " + lis_from[g] + " " + "<b>" + text1 +
+                                "</b>" + "<br>" +
+                                next_lines;
+                        lis_text[g] = text2;
+                }
+        } // end of overlapping 
+
+        //------------------------------------
+        function from_lists_to_one_line() {
+                var num_ent = lis_from.length;
+                var out_text = "";
+                for (var g = 0; g < num_ent; g++) {
+                        var fromtime = lis_from[g];
+                        var srt_secs_from = lis_secs_from[g];
+                        var srt_secs_to = lis_secs_to[g];
+                        var text1 = lis_text[g];
+                        text1 = removeFont(text1);
+                        var outline1 = fromtime + " (" + form53(srt_secs_from) +
+                                ") (" + form53(srt_secs_to) + ")  " + text1;
+
+                        outline1 = "<br><hr>" + text1;
+
+                        out_text += outline1 + "\n";
+                }
+                return out_text;
+        }
+        //---------------------------------------------------
+}
+//  end of get_srt_data
+
+//---------------------------------------------------
+
+function removeFont(str0) {
+        //   <font-color="#123456"> xxxxxxxxxxx </font>
+		if (str0.indexOf("<") < 0) {return str0}; 
+		var z1=0, f1=-1, f2=-1;
+		var wrk;
+		var str1 = str0; 
+		
+		for(z1=0; z1 < str1.length; z1++) {
+			f1 = str1.indexOf("<",f1+1);
+            if (f1 < 0) { break; }
+			f2 = str1.indexOf(">", f1+1);
+			if (f2 < 0) { break; }
+			wrk = str1.substring(f1,f2).toLowerCase();
+			if (wrk.indexOf("font") >=0) {
+				str1 = str1.substring(0,f1) + " " + str1.substring(f2+1);
+			}
+		}  
+		
+		// eliminate also all quotes and apostrophes    
+		
+        return str1.replaceAll('"', '&quot;').replaceAll("'", "&apos;");
+
+} //----------------------------------------
+//-----------------------------------
+
+
+	//--------------------------------------
+function fmt_secs(seconds0, intB, decA) {
+        //    numfmt = fmt_secs( 12.3, 4,2) --> "  12.30"
+		var inte1, str1, str2 ;
+		if (seconds0 < 0.001){
+			inte1 = "                  " + "0";
+			str1 = inte1.substring(inte1.length - intB);
+			return str1 +"." + "00000000000000000".substring(0,decA) ; 
+		}  
+		var seconds= seconds0 + 0.00000000001;   // in this way there is always a decimal point
+		
+        var dec1 = seconds - Math.floor(seconds);
+        inte1 = "                  " + (seconds - dec1);
+
+        str1 = inte1.substring(inte1.length - intB);
+
+        str2 = (dec1 + "000000000000").substring(1, decA + 2);	
+		
+        return str1 + str2;
+}
+//------------------------	
+//--------------------------------------
+function OLDfmt_secs(seconds, intB, decA) {
+        //    numfmt = fmt_secs( 12.3, 4,2) --> "  12.30"
+        var dec1 = seconds - Math.floor(seconds);
+        var inte1 = "                  " + (seconds - dec1);
+
+        var str1 = inte1.substring(inte1.length - intB);
+
+        var str2 = (dec1 + "000000000000").substring(1, decA + 2);
+        return str1 + str2;
+}
+//------------------------
+
+//////////////////////////////////////////////
+
+function h2_update_locstor_value() {
+        id_next_secs_value = document.getElementById("id_next_secs").value;
+        id_prev_secs_value = document.getElementById("id_prev_secs").value;
+
+        if (typeof(Storage) !== "undefined") {
+                localStorage.stor_id_next_secs_value = id_next_secs_value;
+                localStorage.stor_id_prev_secs_value = id_prev_secs_value;
+        }
+}
+
+//-----------------------------------------
+function get_local_storage_value() {
+        if (typeof(Storage) !== "undefined") {
+                if (localStorage.stor_id_next_secs_value) {
+                        id_next_secs_value = localStorage.stor_id_next_secs_value;
+                } else {
+                        localStorage.stor_id_next_secs_value = id_next_secs_value;
+                }
+                if (localStorage.stor_id_prev_secs_value) {
+                        id_prev_secs_value = localStorage.stor_id_prev_secs_value;
+                } else {
+                        localStorage.stor_id_prev_secs_value = id_prev_secs_value;
+                }
+        }
+        document.getElementById("id_next_secs").value =
+                id_next_secs_value;
+        document.getElementById("id_prev_secs").value =
+                id_prev_secs_value;
+}
+
+
+//---------------------------------------------------------
+function get_filename(x) {
+        var txt = "";
+        try {
+                if (x.files.length > 0) {
+                        txt = text_byid("m750"); // "Select one or more files.";
+                        return x.files[0].name;
+                }
+        } catch (e1) {}
+        return "";
+}
+//---------------------------
+
+function h1_get_video_filename(  this1  ) {
+		
+		// called by onchange  "id_file1video" 
+		
+		var arr_out = h1_get_file_name_type( this1, " video audio ");  
+		video_filename = arr_out[0];
+		video_filetype = arr_out[1];
+		
+		// m822 823 To improve understanding of the foreign language, the film/audio can be viewed in small pieces of the desired size
+		// m867 868 Select the subtitles files and then click here below to download the files to play the video/audio clip by clip
+		
+		var msg867_868 = "";	
+		
+		if (video_filetype.substring(0,5) == "video") {
+			videoaudioTYPE = "video"; 				
+			msg867_868 = document.getElementById("m867").innerHTML 
+			document.getElementById("m822_823").innerHTML = document.getElementById("m822").innerHTML 
+		} else {
+			if (video_filetype.substring(0,5) == "audio") {
+				videoaudioTYPE = "audio"; 	
+				msg867_868 = document.getElementById("m868").innerHTML 				
+				document.getElementById("m822_823").innerHTML = document.getElementById("m823").innerHTML 
+			} 
+		} 			
+		document.getElementById("m867_868").innerHTML = msg867_868; 		
+		
+		video_filesize = arr_out[3];
+		video_fileerror= arr_out[4];
+			
+		var msg = video_filename + "<small><br>(" + video_filetype + " " + video_filesize + ")</small>"; 	
+		
+		if (video_fileerror) {
+			//msg += '<br><span class="c_error">file type error <br>neither video nor audio</span>' ;  //  né video né audio
+			msg += '<br><span class="c_error">' +  document.getElementById("m850").innerHTML +   '</span>' ;  //  né video né audio
+			document.getElementById("id_msg13A").innerHTML = msg; 
+			document.getElementById("id_msg13A").className = "c_error"
+			return 	
+		} 
+		/**
+		else {
+			document.getElementById("butFvideoGet").style.display="block";		
+		}
+		document.getElementById("id_msg13A").innerHTML = msg; 
+		**/
+		
+} // end of h1_get_video_filename()
+
+//---------------------------
+function h1_get_file_name_type( ele1, valid_type ) {
+		
+        if (ele1 == null) {
+                return;
+        }
+        if (ele1.files.length < 1) {
+                return;
+        }
+		
+        var file1 = ele1.files[0];       
+		
+		var fftt = file1.type.split("/")  ;
+		var filetype2 = fftt[0].toLowerCase().trim();
+		
+		if (filetype2 == "") {  filetype2 = "text"} 
+		
+		var filesize = file1.size;
+		var fsize="";
+		if (filesize < 1024) {
+				fsize = filesize + "bytes";
+		} else {
+				if (filesize < (1024*1024)) {
+					fsize = (filesize/1024).toFixed(0) + "Kb";
+				}  else {
+					fsize = (filesize/(1024*1024)).toFixed(0) + "Mb";
+				}
+		} 
+		
+		var ltype = " " + valid_type.toLowerCase() + " ";  
+		var sw_error = false;
+		if (ltype.indexOf( filetype2 ) < 0) {
+			sw_error = true;  
+		}		
+		return  [file1.name, file1.type, filesize, fsize, sw_error ] ; 
+}
+
+//---------------------------------------------------------------------------
+function h1_get_video_chosen_file2() {
+		
+		// called by onchange   "id_file1video" 
+		
+		if (video_fileerror) {
+			return; 
+		}
+		if (video_filename == "") { 
+				var msgerr1 = "video file name is missing"; 
+				document.getElementById("id_msg13A").innerHTML = msgerr1 + "<br>&nbsp;";
+                document.getElementById("id_msg13A").style.backgroundColor = "white";
+				return;
+		}	
+		
+		document.getElementById("id_msg13A").innerHTML = video_filename;
+		
+		//video_path = document.getElementById("id_pathVideo").value.trim() ;	
+		
+		video_path = "VideoAudio\\";
+		/**
+		if (video_path == "") {			
+			video_src = video_filename; 			
+		} else {
+			var lenfile = video_filename.length;
+			var lenpath = video_path.length; 
+			if (video_path.substring(lenpath-lenfile) != video_filename) {	
+				if (video_path.substring( lenpath.length-1) != barra) {video_path += barra;}
+				video_path += video_filename; 
+				document.getElementById("id_pathVideo").value = video_path; 
+			}				
+			video_src = 'file:' + barra + barra + barra + video_path;  			
+		}		
+		**/
+
+		video_src = video_path + video_filename; 
+		
+		//console.log( "video_src=" + video_src);
+		
+		document.getElementById("id_video1").src = video_src;	
+		
+		//console.log("video src 0  video.src=" + video_src); 
+		
+		
+		document.getElementById("but_titleGet").style.display="block";  
+		document.getElementById("id_video_fn").innerHTML = video_filename ; 
+        
+		fun_after_drop_uno();
+		
+		
+	    //document.getElementById("but_titleGet").style.display="block";  
+		//document.getElementById("id_video_fn").innerHTML = video_filename ; 
+}
+
+//-------------------------------------------------
+function h1_button_continue2() {
+
+		if (sw_ready_to_write) {
+			document.getElementById("id_div13A").style.display="none"; 
+			//document.getElementById("id_div13").style.display="block";
+		} else {
+			h1_get_video_chosen_file(); 
+		}
+}
+
+//------------------------------------------------------------
+function fun_display(blockNone, array_id) {
+        // blockNone =   "block" or "none"   
+        // array_id  =  one or more id of element to display or to hide     
+        if (typeof(array_id) == "string") {
+                array_id = [array_id];
+        }
+        for (var i1 = 0; i1 < array_id.length; i1++) {
+                document.getElementById(array_id[i1]).style.display =
+                        blockNone;
+        }
+}
+//----------------------------
+function errorVideoFile(src_var1) {
+
+		
+        var html_file_path = window.location.pathname;
+        var i1 = html_file_path.lastIndexOf(barra);
+        var html_base_path = html_file_path.substring(0, i1);
+
+        var i2 = src_var1.lastIndexOf(barra);
+        var src_base_path = src_var1.substring(0, i2);
+        var video_fn = src_var1.substring(i2 + 1);
+
+        var video_fn1 = '<span style="color:blue;">' + video_fn + '</span>';
+        var video_err_msg = "<br>" + video_fn1 + "</b><br>" + document.getElementById("m752").innerHTML; // can't be played";
+        if (src_var1.substring(0, 5) == "file:") {
+                if (src_base_path.substring(7) == html_base_path) {
+                        if (html_base_path.substring(0, 1) == barra) {
+                                html_base_path = html_base_path.substring(1);
+                        }                        
+						 video_err_msg += "puoi selezionare solo un file che si trova nella cartella <br> <b>ClipByClip/VideoAudio</b>" +
+									"copia il file video o audio in questa cartella  e riprova" +"<br>" + "L'indirizzo della cartella non è stato specificato";
+						 
+                } else {
+                        // "m755 Check if the path is right:
+                        video_err_msg += "<br>" + document.getElementById("m755").innerHTML; + " " + src_var1;
+                }
+				// video_err_msg += "<br>" + "Seleziona di nuovo il file e ricordati di inserire l'indirizzo completo della cartella"
+        }
+		//document.getElementById("butFvideoGet").style.display="block";		
+        return video_err_msg.replaceAll("%20", " ");
+}
+
+
+
+//------------------------------------------		 
+function h1_hide_show(id1) {
+
+        var x = document.getElementById(id1);
+		
+        if (x.style.display === "none") {
+                x.style.display = "block";
+				
+				x.innerHTML = '<iframe id="id_iframe" src="doc/ClipByClip_description_' + myLang + 
+					'.html" title="Info"  style="width:100%;height:100%;border: 4px solid black;"></iframe>' 
+				
+				
+        } else {
+                x.style.display = "none";
+        }
+} //----------------------------------------
+
+//------------------------------------------
+
+function fun_after_drop_uno() {
+	    // called by h1_get_video_chosen_file2() which was called by onchange  "id_file1video" 
+        
+
+        document.getElementById("id_video1").style.display= "block";   
+
+        document.getElementById("id_msg13A").innerHTML = "";
+        document.getElementById("id_msg13A").style.backgroundColor = "rgb(0 142 255/52%)";
+
+		
+		
+        var vid00 = document.getElementById("id_video1");
+        if (vid00 == undefined) {
+                return false;
+        }
+		
+        if (vid00.src == undefined) {
+                return false;
+        }
+        if (vid00.src == null) {
+                return false;
+        }
+        if (vid00.src == "") {
+                return false;
+        }
+		
+	
+		
+        src_var = vid00.src;
+		//console.log("video src 2  vid00.src=" + src_var); 
+		vid00.src = decodeURIComponent(src_var);  // transform url encode to utf8  (eg. from %20 to ' ')  
+		
+		var str_vid_aud;
+		
+		/*
+		????????
+		<video id="myVideo" controls height="auto" style="display:block; width:90%; margin: auto;" \n' +
+               <source type=' + video_filetype + ' src="' + vid00.src + '" >  \n' +
+		       Your browser does not support ' + video_filetype + '    \n' +   
+        </video> \n';
+		
+		<video id="myVideo" controls height="auto" style="display:block; width:90%; height:3rem; margin: auto;" \n' +
+		       <source  type=' + video_filetype + '  src="' + vid00.src + '" >  \n' +
+		       Your browser does not support ' + video_filetype + '    \n' +   
+		</video> \n';		
+		????????????????
+		*/
+		/***
+		if (videoaudioTYPE == "video") {
+            str_vid_aud = '\n' +
+                '       <video id="myVideo" controls  onloadedmetadata="onloaded_fun(this,0.40)"  \n' +
+                '          <source type=' + video_filetype + ' src="' + vid00.src + '" >  \n' +
+				'          Your browser does not support ' + video_filetype + '    \n' +   
+                '       </video> \n';
+		} else {			
+			if (videoaudioTYPE == "audio") {   // I use <video> instead of <audio> on purpose: using audio the line control is not displayed unless you don't reload the page (I don't know why) )  
+				str_vid_aud = '\n<br><br>\n' +
+					'       <video id="myVideo" controls   onloadedmetadata="onloaded_fun(this,0.40)" \n' +
+					'          <source  type=' + video_filetype + '  src="' + vid00.src + '" >  \n' +
+					'          Your browser does not support ' + video_filetype + '    \n' +   
+					'       </video> \n';
+			}
+		}	
+        document.getElementById("id_div_video_audio").innerHTML = str_vid_aud;
+		***/
+		
+		
+		
+		vid = document.getElementById("myVideo");	
+		vid.src = vid00.src; 
+		
+		
+		//modify_video_dimensions1( vid, 0.45 ); 
+		
+		
+		
+		document.getElementById("id_err_video1").style.display = "none"; 
+		//document.getElementById("butFvideoGet").style.display="block"; 
+		document.getElementById("id_err_video1").innerHTML = ""; 
+        document.getElementById("id_video1").style.display = "block"; 
+		vid.addEventListener('error', function(e) {
+				
+				//document.getElementById("butFvideoGet").style.display="none"; 
+				
+				
+                var video_err_msg = errorVideoFile(vid00.src);
+				
+				document.getElementById("id_err_video1").style.display = "block"; 
+				document.getElementById("id_err_video1").innerHTML = video_err_msg + "<br>&nbsp;"; 
+				document.getElementById("id_err_video1").style.backgroundColor = "white"; 
+				
+				document.getElementById("id_video1").style.display = "none"; 
+                //document.getElementById("id_msg13A").innerHTML = video_err_msg + "<br>&nbsp;";
+                //document.getElementById("id_msg13A").style.backgroundColor = "white";
+                //document.getElementById("id_msg13A").innerHTML = vid00.src + " file error"				
+                return false;
+        });
+		
+		
+	
+        // Initializing values
+        isPlaying = false;
+        // On video playing toggle values
+
+        vid.onplaying = function() {
+                isPlaying = true;
+        };
+
+        // On video pause toggle values
+        vid.onpause = function() {
+                isPlaying = false;
+        };
+		
+        document.getElementById("id_msg13A").innerHTML = "";
+
+        
+		
+		
+        document.getElementById("id_video1").parentElement.style.display = "block";
+        document.getElementById("id_msg13A").style.display = "none";
+       
+        //document.getElementById("id_td_vid0").style.display = "none";
+		
+        sw_ready_to_write = true;
+		sw_video_ok = true; 
+
+		//console.log( "fun...uno sw_ready... true")
+	
+        return true;
+} // end of  fun_after_drop_uno()
+
+//----------------------------------------
+function is_no_dialog(frase0) {
+
+        //  return true is the line doesn't contain a dialog: eg. [Applause]   or [Music]   
+		
+		var frase = frase0.trim();
+		var charFirst = frase.substring(0,1);
+		var charLast  = frase.substring( frase.length-1 );
+		
+	var swMio = ( frase.indexOf("[dramatic music]") >=0 ); 	
+	//if (swMio) { console.log("is_no_dialog(" + frase + "  charFirst=" +  charFirst + "<==  charLast=" + charLast + "<=="); } 
+	
+		if  (charFirst == charLast ) {
+			// assume it's a dialog if the line ends and begins with the same character which is not a letter or number  
+			var letters = /[a-zA-Z0-9?!-]/g;
+			
+			//if (swMio) { console.log("is_no_dialog(   eguali  " + " match="  + (charFirst == charFirst.match(letters) )   ); } 
+			
+			if (charFirst == charFirst.match(letters) ) { return false} ;
+			return true;  
+		} else {
+			// assume it's a dialog if the line is between a parentesis or brackets   
+			var str1 = " " + charFirst + charLast + " ";
+			if ("   [] {} ()  ".indexOf( str1 ) >=0 ) {return true }  
+			return false
+ 		}
+} // end of  is_no_dialog()
+//------------------------------------------
+
+function OLDis_no_dialog(frase0) {
+        //   check something like  [Applause]   or [Music]
+        var frase = frase0.trim();
+        var ipa1 = frase.indexOf("[");
+        if (ipa1 != 0) {
+                return false;
+        }
+        var ipa2 = frase.indexOf("]", ipa1);
+        if (ipa2 < 0) {
+                return false;
+        }
+        if ((ipa2 + 1) < frase.length) {
+                return false;
+        }
+        //console.log( "NO DIALOG: " + frase ); 
+        return true;
+}
+//----------------
+function get_title() {
+		var msgerr1 = "";
+        var out_title = document.getElementById("out_title").value.trim();
+        if (out_title == "") {
+
+                msgerr1 = "<br>" + text_byid("m720"); //  "join1 m720 title is missing"
+                document.getElementById("id_msg16").innerHTML = msgerr1;
+                document.getElementById("id_msg16").style.backgroundColor =
+                        "white";
+                return;
+        }
+		sw_title_ok = true; 
+		
+        HTML_TITLE     = out_title;
+		out_html_file  = "ClipByClip_"  + "_" + HTML_TITLE;
+		script_lev2_fn = "ClipByClip_"  +       HTML_TITLE + ".sub.jstxt"; 
+
+        document.getElementById("id_titolo" ).innerHTML = HTML_TITLE;		
+		document.getElementById("id_title15").innerHTML = HTML_TITLE; 
+		document.getElementById("id_title16").innerHTML = HTML_TITLE; 	
+		
+		var msg867_868 = document.getElementById("m867_868").innerHTML;  
+		msg867_868 += '<table>' 
+		msg867_868 += '<tr><td style="width:4rem;">&nbsp;</td><td>' + '<b>' +  out_html_file + ".html"  + '</b>' + 
+							'</td><td><small>(' + document.getElementById("m862").innerHTML + ')</small>'  + '</td></tr>' ;     
+		
+		//msg867_868 += '<tr><td style="width:4rem;">&nbsp;</td><td>' + '<b>' +  script_lev2_fn + '</b>' + '</td><td><small>' + '  ' +  '</small>'  + '</td></tr>' ; 
+		
+		msg867_868 += '</table>'; 
+		document.getElementById("m867_868").innerHTML = msg867_868; 
+		
+		document.getElementById("id_div14").style.display="none";
+	
+		if (videoaudioTYPE == "audio") {
+			document.getElementById("id_div15").style.display="none";		
+			document.getElementById("id_div16").style.display="block";	
+			return;  
+		}
+			
+		document.getElementById("id_div15").style.display="block";	
+
+		document.getElementById("id_videocopy").innerHTML = document.getElementById("id_div_video_audio").innerHTML ; 				
+	
+}
+//----------------------------------
+
+function h1_check_if_hard_subtitle() {
+		// fired by continue15 button 
+
+		HARD_subtitle = (document.getElementById("id_subhard").checked) 	
+		
+		document.getElementById("id_div15").style.display="none";
+		
+		document.getElementById("id_div16").style.display="block";		
+		if (HARD_subtitle) {
+			document.getElementById("id_up_filetesto1").innerHTML = "<b>" + document.getElementById("m871").innerHTML + "</b" ; // m871 hard coded inside the video file    
+			document.getElementById("txt_pagOrig").value = HARDCODED + "\nSUBTITLES\n";  
+			document.getElementById("txt_pagOrig").style.display="none";  
+			document.getElementById("id_hardsub").innerHTML = HARD_subtitle;  
+		}
+		
+
+} // end of h1_check_if_hard_subtitle()
+//-----------------------------------------
+function h1_join_orig_trad() {
+		var msgerr1 = "";
+        
+
+        var testo_orig = get_srt_data(document.getElementById("txt_pagOrig").value);
+
+        var testo_trad = get_srt_data(document.getElementById("txt_pagTrad").value);
+		
+		if (HARD_subtitle) {
+			testo_orig = testo_trad; 
+		} 
+		/*
+		else {
+			if ((testo_orig == "") && (testo_trad="")) {
+				return; 
+			}
+		}
+		*/
+
+        // load subtitles  
+        var righe_orig = testo_orig.split("\n");
+        var righe_trad = testo_trad.split("\n");
+        var num_orig = righe_orig.length;
+        var num_trad = righe_trad.length;
+        //console.log( "num_orig=" + num_orig + "    num_trad=" + num_trad);
+
+        if (num_orig < 2) {
+             msgerr1 += text_byid("m721"); //  m721 the source language subtitle file  has not been read or is empty" ;  
+			 //console.log( "testo_orig=" +  testo_orig.substring(0,200));
+        }
+        if (num_trad < 2) {
+                swTranslate = false;
+                //(if (msgerr1 != "") { msgerr1 +="<br>"}
+                // msgerr1 += "the translated text file  has not been read or is empty" ;  
+        } else {
+                swTranslate = true;
+        }
+        if (msgerr1 != "") {
+                document.getElementById("id_msg16").innerHTML = "<br>" +    msgerr1;
+                document.getElementById("id_msg16").style.backgroundColor = "white";
+                //return;       //  eseguo anche se senza sottotitoli 
+        }
+		
+		if (num_trad > 1) {
+                swTranslate = true;
+		}
+
+        var ret_txt = add_nodialog_clips(righe_orig, righe_trad);
+
+        document.getElementById("txt_pagOrig").value = ret_txt[0];
+        document.getElementById("txt_pagTrad").value = ret_txt[1];
+
+        
+		//script_player_line = '<script src="' + script_lev2_fn + '"   defer  ></script>	\n' +	
+		
+		script_player_line = '<script src="' + '../scripts/ClipByClip_player_zz_script.jstxt"    defer  ></script>  \n' ; 
+		script_player_line += '<link rel="stylesheet" href="../scripts/ClipByClip_style.css">   \n'; 
+		
+		
+        write_script2(script_lev2_fn, ret_txt[0], ret_txt[1]);
+
+        //console.log("caricato testo " + document.getElementById("inp_text").innerHTML.substring(0,150)); 
+        document.getElementById("id_div00").style.display   = "none";
+        //document.getElementById("id_div12").style.display = "block";   
+        //document.getElementById("id_div13").style.display = "block";
+        document.getElementById("id_ch_lang").style.display = "none";
+        document.getElementById("id_h1").innerHTML = "Clip by Clip";
+		
+	
+        document.getElementById("id_div16").style.display = "block";
+		
+		sw_sub_ok = true; 
+		
+		h1_write_html();
+		
+		document.getElementById("id_table16").style.display = "none" ;
+		document.getElementById("match1"    ).style.display = "none" ;
+		
+		document.getElementById("id_msg16").style.display = "block";
+        //document.getElementById("id_msg16").innerHTML =   "m 731 scritto file"+  
+		
+		/*
+		<span id="m858">The construction of the files is finished</span>
+		<span id="m859">move the two downloaded files from the downloads folder to the <b> ClipByClip/PLAYER</b> folder</span>
+		<span id="m860">The <b>ClipByClip</b> folder must contain</span> 
+		<span id="m861">Folder</span>
+		<span id="m862">the file to execute</span>
+		<span id="m863">video or audio to be played</span>		
+		*/
+		var spazioC = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'; 
+		var spazioF = '' ; // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'; 
+		var fontF1 = "font-size:1.0rem;"
+		
+		//  '   <tr><td></td><td style=' + fontF1+ '"><b>' + spazioF +  script_lev2_fn                           + '</b></td><td></td></tr>' +
+		
+		var msg17 = '<span style="font-size:2.0rem;"><b>'  + document.getElementById("m858").innerHTML + '</b>' + '</span>' +				
+				'<span style="font-size:1.3rem;">' +  
+				'<br><br>' + document.getElementById("m859").innerHTML +  				
+				'<br><br>' + 
+				'<table>' +
+				'   <tr><td colspan="2">' + document.getElementById("m860").innerHTML   +"<br>"                                                       +     '</td><td></td></tr>' + 
+				'   <tr><td>' + spazioC + document.getElementById("m861").innerHTML  + '</td><td><b>'  + 'PLAYER'                + '</b></td><td></td></tr>' + 
+				'   <tr><td></td><td style=' + fontF1+ '"><b>' + spazioF  +  out_html_file + ".html"  +           
+							'</b></td><td  style=' + fontF1+ '"><small>' + document.getElementById("m862").innerHTML                                                 +     '</small> </td></tr>' + 
+				
+				'   <tr><td>' + spazioC + document.getElementById("m861").innerHTML  + '</td><td><b>'   + 'scripts'              + '</b></td><td></td></tr>' +    
+				'   <tr><td></td><td <td style="font-size:1.0rem;"><b>' + spazioF  +  'ClipByClip_player_zz_script.jstxt'      + '</b></td><td></td></tr>' +
+				'   <tr><td></td><td style=' + fontF1+ '"><b>' + spazioF  +  'ClipByClip_style.css'                   + '</b></td><td></td></tr>' +				
+				'   <tr><td>' + spazioC + document.getElementById("m861").innerHTML  + '</td><td><b>'   + 'VideoAudio'           + '</b></td><td></td></tr>' +    
+				'   <tr><td></td><td style=' + fontF1+ '"><b>' + spazioF  +  video_filename  + '</b></td><td  style=' + fontF1+ '"><small>' + document.getElementById("m863").innerHTML + '</small></td></tr>' +    
+				'</table>' +
+				'</span>' ; 
+				
+				
+		document.getElementById("id_div16").style.display = "none";  
+		
+		document.getElementById("id_msg17").innerHTML = "<br><br>" + msg17 ;   //  end of file building  
+		document.getElementById("id_div17").style.display = "block";  
+}
+//----------------------------------------------------
+//--------------------------------------------------
+function write_script2(script_lev2_fn, TXTorig, TXTtran) {
+
+        var str_orig = TXTorig.replaceAll('"', '&quot;').replaceAll("'", "&apos;");
+        var str_tran = TXTtran.replaceAll('"', '&quot;').replaceAll("'", "&apos;");
+
+        str_orig = str_orig.replaceAll("\n", '<br>" +  \n     "');
+        str_tran = str_tran.replaceAll("\n", '<br>" +  \n     "');
+
+        var script_lev2_str = 'var inp_text_orig = ""  + \n     "' + str_orig + '";' +
+                "\n" +
+                'var inp_text_tran = ""  + \n     "' + str_tran + '";';
+
+		document.getElementById("id_script_lev2").innerHTML="" +
+			"<script> \n" + 
+			script_lev2_str	 +
+			"\n" + 
+			"function onloaded_fun(fVideo, hperc) {} \n"	
+			
+			"<\/script>" 
+        //download(script_lev2_fn, script_lev2_str);
+
+} // end write-script 
+//-------------------------------------------------
+function sort_onFirstNum(a, b) {
+        // ascending order sort on first and second  number
+        var a1 = time_split(a);
+        var b1 = time_split(b);
+        var ak = a1[0];
+        var bk = b1[0];
+        var diff1 = ak - bk;
+        if (diff1 == 0) {
+                ak = a1[1];
+                bk = b1[1];
+                diff1 = ak - bk;
+        }
+        return diff1;
+}
+//-----------------------------------
+function time_split(str1) {
+        //    123.000:224.000:: text123
+        var pp = str1.split("::");
+        return pp[0].split(":");
+}
+
+
+//---------------------------------------------------
+function add_nodialog_clips(righe_orig, righe_trad) {
+        // aggiungi intervalli senza dialogo contemporanemanete nell'origine e nel tradotto
+
+        //--------------------------------
+        //  1) eliminate no_dialog clips 
+        //  2) insert one no_dialog clip in the gap between two dialog clips
+        //--------------------------------
+        //  1) eliminate no_dialog_clips	
+
+        var righeOT = [];
+        var righe_orig2 = [];
+        var righe_trad2 = [];
+        var i, riga, parte, frase;
+
+        for (i = 0; i < righe_orig.length; i++) {
+                riga = righe_orig[i];
+				riga = removeFont(riga);
+                if (riga == "") {
+                        continue;
+                }
+                parte = riga.split("::");
+                frase = parte[1];
+                if (frase != "") {
+                        if (is_no_dialog(frase)) {
+                                continue;
+                        }
+                }
+                
+                righeOT.push(riga);
+                righe_orig2.push(riga);
+        }
+		
+		if (righe_trad.length< 2) {
+			righe_trad = []; 
+			righe_trad2 = []; 
+		}
+		if (swTranslate)  {
+			for (i = 0; i < righe_trad.length; i++) {
+					riga = righe_trad[i];
+					riga = removeFont(riga);
+					if (riga == "") {
+							continue;
+					}
+					parte = riga.split("::");
+					frase = parte[1];
+					if (frase != "") {
+							if (is_no_dialog(frase)) {
+									continue;
+							}
+					}
+					
+					righeOT.push(riga);
+					righe_trad2.push(riga);
+			}
+		}
+        righeOT.sort(function(a, b) {
+                return sort_onFirstNum(a, b);
+        });
+        //-------------------------------------------------------------------
+        //  2) insert one no_dialog clip in the gap between two dialog clips
+
+        var fromT, toT;
+        var from2, to2;
+        var diafrom, diato;
+        var toTimeP = 0;
+        var silent_gap = 0;
+        var silent_row;
+        var out_txt = "";
+		var i1=0; 
+        for (i = 0; i < righeOT.length; i++) {
+				i1 = i-1; if (i1<0) {i1=0;}
+                riga = righeOT[i];
+                parte = time_split(riga);
+
+                fromT = 1 * parte[0];
+                toT = 1 * parte[1];
+				
+				if (fromT > toTimeP) {
+					silent_gap = fromT - toTimeP;
+					
+					if (silent_gap >= SILENT_GAP_LIMIT) {
+							from2 = toTimeP;
+							to2 = fromT;
+							diafrom = from_secs_to_hh_mm_ss(from2);
+							diato   = from_secs_to_hh_mm_ss(to2);
+							// msg 730 = seconds no dialog 					
+							/*
+							silent_row = fmt_secs(from2, 5, 3) + ":" + fmt_secs(to2, 5, 3) + ":: " + sayNODIALOG +
+									silent_gap.toFixed(0) + " " + text_byid("m730") +
+									"  (" + diafrom + " - " + diato + ")"  + " from2=" + from2 + " to2="+ to2 + " riga=" + riga + " prec.=" + righeOT[i1]; 
+							*/		
+							silent_row =  fmt_secs(from2, 5, 3) + ":" + fmt_secs(to2, 5, 3) + ":: " + sayNODIALOG + silent_gap.toFixed(0) + " " + text_byid("m730") +
+									"  (" + diafrom + " - " + diato + ")" ;
+							
+
+							righe_orig2.push(silent_row);
+							if (swTranslate) {
+								righe_trad2.push(silent_row);
+							}
+					}
+				}
+                toTimeP = toT;
+        }
+        righe_orig2.sort(function(a, b) {
+                return sort_onFirstNum(a, b);
+        });
+        righe_trad2.sort(function(a, b) {
+                return sort_onFirstNum(a, b);
+        });
+
+        var text_orig2 = "",
+                text_trad2 = "";
+        for (i = 0; i < righe_orig2.length; i++) {
+                text_orig2 += righe_orig2[i] + "\n";
+        }
+        for (i = 0; i < righe_trad2.length; i++) {
+                text_trad2 += righe_trad2[i] + "\n";
+        }
+		if (HARD_subtitle) {
+			text_orig2 = HARDCODED; 
+		}
+		
+		if (swTranslate == false) {  text_trad2="";  }
+		
+        return [text_orig2, text_trad2];
+		
+} // end sdd_nodialog_clips
+//------------------------------------------------------]
+
+
+//--------------------------------------
+function h1_fileRead(input, miotext) {
+
+		var arr_out = h1_get_file_name_type( input, " text ");  
+		/*
+		for(var x=0; x< arr_out.length; x++) {
+			console.log("h1_fileRead() arr_out[" + x + "] = " + arr_out[x] )  
+		}  
+		*/
+		
+		//srt1_filename = arr_out[0];
+		//srt1_filetype = arr_out[1];
+		//srt1_filesize = arr_out[3];
+		var sw_fileerror= arr_out[4];	
+		
+		document.getElementById("match1").style.display="block"; 
+		document.getElementById("m718").style.display="block"; 
+		if (sw_fileerror) {			 
+			document.getElementById("id_msg16_err").style.display = "block"; 
+			document.getElementById(miotext).value = arr_out[0] + "<br>" + arr_out[1] + document.getElementById("m864").innerHTML;
+			
+			var msg2 = document.getElementById("m865").innerHTML ; //  is not a text file
+			
+			document.getElementById("id_msg16_err").innerHTML = "<br>" +   arr_out[0] + "<br>" + arr_out[1] + "<br>" + msg2;
+			
+			document.getElementById("match1").style.display="none"; 
+			document.getElementById("m718").style.display="none"; 
+			
+			return ; 
+		} 
+		document.getElementById("id_msg16_err").style.display = "none"; 
+
+		document.getElementById("id_msg13A").innerHTML = "";
+        document.getElementById("id_msg13A").style.color = "red";   
+		
+		
+        var file = input.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function() {
+                document.getElementById(miotext).value = reader.result;
+                //console.log(reader.result);
+        };
+        reader.onerror = function() {
+                //console.log(reader.error);
+                document.getElementById(miotext).value = reader.error;
+        };
+}
+
+//-------------------------------------------------
+function extract_time(riga0, irig) {
+        // 00:00:04.000 (4) (8)  Alle sind zu Hause, alle beschaeftigt am Computer::8::(alle) (sind) (zu) (hause) (alle) (beschäftigt) (am) (computer) 
+        // 012345678901234567890 
+
+        /*
+        	"(.724)) error1 in the previous step: line in unaspected format in extract_time(" + 
+        	"(.725)) error2 in the previous step: line in unaspected format in  extract_time(" + 
+        	"(.726)) error3 in extract_time() " + 
+        */
+        var timestamp = riga0.substring(0, 12);
+        var riga = riga0.substring(13);
+        var f1 = riga.indexOf(")");
+        if (f1 < 0) {
+                alert(text_byid("m724") + riga0 + ") \ni=" + irig);
+        }
+        var f2 = riga.indexOf(")", f1 + 1);
+        if (f2 < 0) {
+                alert(text_byid("m725") + riga0 + ")\ni=" + irig);
+        }
+        var tm1 = riga.substring(0, f1).trim().substring(1);
+        var tm2 = riga.substring(f1 + 1, f2).trim().substring(1);
+
+        var resto2 = riga.substring(f2 + 1).trim();
+        if (resto2 == "") {
+                alert(text_byid("m726") + " i=" + irig + "\nriga0=" +
+                        riga0 + "\nriga=" + riga + "\nf1=" + f1 + "    f2=" +
+                        f2);
+        }
+        return [timestamp.replace(",", "."), tm1, tm2, resto2];
+}
+
+//----------------------------------------------------  
+function copyToClipboard1(text) {
+        //var input = document.body.appendChild( document.createElement("input") );
+        var input = document.getElementById("inp1");
+        input.value = text;
+        input.focus();
+        input.select();
+        document.execCommand('copy');
+        //input.parentNode.removeChild(input);
+}
+//---------------------------------------------
+function change_script_and_style_ref(htmltext) {
+		
+        var k1 = htmltext.indexOf("<script");
+        var jst = htmltext.indexOf("<\/head>", k1+1);
+		if ((k1 < 0) || (jst < k1)) {
+			alert("error in file 'ClipByClip_builder.html' \n" + 
+				"all script statement must be together and before  the </head> statement. ");			
+		} 
+		var htmltext_1 = htmltext.substring(0, k1);
+		var htmltext_2 = htmltext.substring(jst);		
+	
+		var htmltext_1 = htmltext.substring(0, k1);
+		var htmltext_2 = htmltext.substring(jst);
+		var interhtml = "" + 
+			"<script>   \n" +
+			"	var SECOND_LEVEL = true; \n" + 
+			"</script>  \n" +
+			script_player_line ; 
+			
+		return  htmltext_1 + interhtml + htmltext_2;	
+		
+} // end of change_script_and_style_ref()
+//---------------------------------------------
+function eliminate_builder_part(htmltext) {
+		var k1 = htmltext.indexOf("<body");
+		var k2_10 = htmltext.indexOf("id_div10", k1);
+		var k3_20 = htmltext.indexOf("id_div20", k2_10);
+		
+		var newtext = htmltext.substring(0,k2_10) + htmltext.substring(k3_20) ; 
+		
+		return newtext;   //   newtext.replace("display:none","display:block")  
+
+} // end of  eliminate_builder_part
+//------------------------------------------	
+function h1_write_html() {
+		
+		//console.log("h1_write_html() 1" )
+		
+        if (sw_video_ok && sw_sub_ok && sw_title_ok) {
+			
+		} else {
+                return;
+        }
+//console.log("h1_write_html() 2" )
+        var save_title = document.title;
+
+        document.title = out_html_file;
+		/*
+        document.getElementById("txt_pagOrig").value = ""; // to spare space on the output html file 
+        document.getElementById("txt_pagTrad").value = ""; // to spare space on the output html file 
+        
+        document.getElementById("id_video1").src = "";
+        document.getElementById("id_video1").onerror = "";
+		
+		document.getElementById("id_div10").style.display = "none";
+        document.getElementById("id_div20").style.display = "block";
+		*/
+		if (videoaudioTYPE == "audio") { 
+			document.getElementById("butMagnify").style.display="none"; 
+		}
+        var htmltext = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+		
+		if (DEBUG) { 
+			download("debug" + ".html", 
+				htmltext.replace("none", "block") 
+			) ;
+		}
+				
+		htmltext = change_script_and_style_ref(  htmltext );
+		htmltext = eliminate_builder_part(htmltext) ; 
+
+        document.title = save_title;
+        download(out_html_file + ".html", htmltext);
+		
+			
+		//console.log("h1_write_html() 3" )
+		
+}
+
+//------------------------------------------	
+function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
+                encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = "none";
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+}
+
+//--------------------------------------------------
+function get_file_mime_type( id_input, loadedfile ) { 
+
+		//   https://humanwhocodes.com/blog/2012/05/08/working-with-files-in-javascript-part-1/
+	
+		var control = document.getElementById( id_input );
+		control.addEventListener("change", function(event) {
+			// When the control has changed, there are new files
+			
+			var files = control.files;  
+			
+			for (var i = 0; i < files.length; i++) {				
+				loadedfile.push( 
+					[ id_input,i, files[i].type,   files[i].size , files[i].name ]
+					);
+			}
+		}, false);
+}	
+//---------------------------------------------	
+//------------------------------------------
+
+function OLDmodify_video_dimensions1( vid, h_percentage ) {
+			
+			//alert( "modify_video_dimensions1  video native " + video_native_width);
+			
+			var video_width = video_native_width;	
+			var video_height= video_native_height;	
+			
+		
+		if (videoaudioTYPE == "audio") {   // audio file  
+				vid.style.width  = "70%"; 
+				vid.style.height = "10%"; 		
+				console.log( "audio??11  video width =" + video_width + "   height=" +  video_height  )		
+				return; 
+		}
+			
+			
+			
+			var perc_video_W_on_H = video_width/ video_height; 
+			
+			var newVideoH =  hScreen * h_percentage; 
+			
+			var newVideoW = newVideoH * perc_video_W_on_H ; 
+			
+			console.log( "video native width =" + video_width + "   height=" +  video_height + " ratio w/h=" +perc_video_W_on_H.toFixed(2) + " newVideoW/H=" + newVideoW + " x " + newVideoH)
+			
+			
+			document.getElementById("divdivdrag").style.width = newVideoW + "px"; 
+			document.getElementById("dragdiv").style.width = newVideoW + "px" ;   
+			
+			/*
+			document.getElementById("divdivdrag").style.width = newVideoW + "px"; 
+			document.getElementById("dragdiv").style.width = newVideoW + "px" ;   
+			
+			
+			  var vid = document.getElementById("myVideo")  
+			  vid.width = newVideoW; 			  
+			  vid.height= "auto"; 
+			*/
+			
+			//console.log( "id_td_video = " + document.getElementById("id_td_video").outerHTML) ; 	
+			
+		} // end of modify_video_dimensions()	  
+//-----------------------------------------------------
+
+function modify_video_dimensions2( vid, h_percentage ) {
+			
+				
+			var video_width = video_native_width;	
+			var video_height= video_native_height;	
+			
+		
+		if (videoaudioTYPE == "audio") {   // audio file  
+				vid.parentElement.style.width  = "90%"; 
+				vid.style.width  = "100%"; 
+				vid.parentElement.style.height = (h_percentage*100).toFixed(0) +"%"; 
+				vid.style.height  = "3.0rem"; 
+				console.log("audio hpercentage=" +  h_percentage + "  parent width=" + vid.parentElement.style.width + " height=" +vid.parentElement.style.height +
+						"    vid width=" + vid.style.width + "  height=" + vid.style.height); 
+				return; 
+		}
+			
+			
+			
+			var perc_video_W_on_H = video_width/ video_height; 
+			
+			var newVideoH = (( hScreen * h_percentage).toFixed(2) )*1 ; ; 
+			
+			var newVideoW = ((newVideoH * perc_video_W_on_H).toFixed(2) )*1 ; 
+			/*
+			vid.parentElement.style.width  = newVideoW + 'px'; 
+			vid.parentElement.style.height = newVideoH + 'px'; 			
+			vid.width= newVideoW; 
+			*/
+			
+			newVideoW += "px";
+			vid.style.margin = "auto"; 
+			vid.style.width  = newVideoW 
+			vid.style.height = newVideoH + 'px'; 	
+			
+
+			document.getElementById("divdivdrag"   ).style.width = newVideoW; 
+			document.getElementById("dragdiv"      ).style.width = newVideoW; 
+			document.getElementById("dragdivheader").style.width = newVideoW; 
+			document.getElementById("drag_textarea").style.width = newVideoW; 
+
+			/*
+			console.log( "video " + vid.id + "  h screen=" + hScreen + " video native width =" + video_width + " x height=" +  video_height + 
+				" ratio w/h=" +perc_video_W_on_H.toFixed(2) + " h_perc.=" + h_percentage +  " newVideoW/H=" + newVideoW + " x " + newVideoH)
+			console.log(vid.parentElement.outerHTML); 	
+			*/
+				
+			
+		} // end of modify_video_dimensions2()	  
+//-----------------------------
+function onloaded_fun(fvideo, fperc) {
+
+		//alert("onloaded video " + fvideo.id );
+		
+		video_native_height = fvideo.videoHeight;
+		video_native_width  = fvideo.videoWidth;
+		
+		modify_video_dimensions2( fvideo, fperc ); 		
+		
+}
+
+//------------------------------------------------------------

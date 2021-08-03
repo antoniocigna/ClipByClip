@@ -1,0 +1,204 @@
+"use strict";
+
+var myLang_default = "EN"; // default = inglese 		
+
+var myLang = navigator.language.substring(0, 2).toLowerCase();
+
+if (myLang == undefined) myLang = myLang_default;
+if (myLang == "undefined") myLang = myLang_default;
+
+//-------------------------------------------------------------
+
+
+var list_msg_text = [];
+var list_msg_id = [];
+
+/**
+righe_lang = build_language_list()
+			var html_elemLingua = document.getElementById("id_ch_lang")
+			html_elemLingua.innerHTML = righe_lang;   
+var myLanguage_msg = "" ;
+getAllMsgInLang_xx( myLang ) ;
+**/
+
+// tutti i messaggi si trovano nel file script ... txtmsg.js 
+//           dove l'ultima riga simile a ==> 
+//                         ==> var list_msg00 = [ ["it", "Italiano", stringa di tutti i msg in italiano (righe separatate da "|") ],  
+//                                                ["en", "English",  mstringa di tutti i msg in inglese]]; 
+//
+//           scelta della lingua: automaticamente cerca la lingua del sistema, se è italiano usa "it", se la lingua xx non si trova nella lista list_msg00 viene sostituita da "en"     
+//-----------------------------------------
+
+function build_language_list() {
+
+    //  la lingua è espressa in 2 caratteri (es. it,  en )  
+    var num_lang = list_msg00.length;
+
+    //console.log("build_language_list   num_lang=" + num_lang);
+
+    //------------------------------------
+    // <div id="id_ch_lang"  style="display:none">
+    var n1;
+    var linguaxx, nomelingua;
+
+    //var righe_lang='<div id="id_onlylang"  >';
+    var righe_lang = "";
+
+    //righe_lang += '<div style="width: 100%; display: flex; align-items: center;">' ; 	
+    //righe_lang += '<div style="margin:auto; width: 100%; text-align:center; ">' ; 	
+    var my_discolpa;
+    var riga1, riga2;
+    righe_lang += '&nbsp;&nbsp;';
+    for (n1 = 0; n1 < num_lang; n1++) {
+
+        linguaxx = list_msg00[n1][0];
+
+        nomelingua = list_msg00[n1][1];
+        var ik = nomelingua.indexOf("<br>");
+        if (ik > 0) {
+            my_discolpa = nomelingua.substring(ik + 4);
+            nomelingua = nomelingua.substring(0, ik);
+        }
+
+        riga1 = '<input type="radio"  id="r_lingua_' + linguaxx + '" name="radio_lingua"  ' +
+            ' style="display:none;"  ' +
+            ' onclick=\'h1_getAllMsgInLang_xx("' + linguaxx + '")\' >';
+
+        //riga2='<label for="r_lingua_' + linguaxx + '" class="c_button2"  title="' + my_discolpa + '" >' + nomelingua + '</label>'; 
+        riga2 = '<label for="r_lingua_' + linguaxx + '" class="button" style="font-size:0.7rem;" title="' +
+            my_discolpa + '" >' + nomelingua + '</label>';
+
+        righe_lang += '<span  >' + riga1 + riga2 + '</span>' + '&nbsp;&nbsp;';
+
+    }
+    //righe_lang += '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>'; 
+    //righe_lang += '</div>'
+    return righe_lang;
+
+} // fine fun  build_language_list() {
+
+//----------------------------------------
+
+//-----------------------------------------
+function h1_getAllMsgInLang_xx(this_lang) {
+
+    //console.log("getAllMsgInLang_xx(  1  " + this_lang);
+
+    myLang = this_lang; // forza la lingua xx nella variabile global (  il parametro this_lang potrebbe non essere quello originale, ma quello scelta dal pulsante apposito)
+
+    //  la lingua è espressa in 2 caratteri (es. it,  en )  
+    var num_lang = list_msg00.length;
+    var lang_xx = "";
+    var list_msg_xx = [];
+    var elem_xx;
+    //------------------------------------
+    // trovo indice di questa lingua 			
+    var ixlang = -1,
+        n1 = 0;
+
+    for (n1 = 0; n1 < num_lang; n1++) {
+        lang_xx = list_msg00[n1][0];
+        if (lang_xx == this_lang) {
+            ixlang = n1;
+        }
+    }
+    if (ixlang < 0) { // se manca si usa il default: en (inglese)
+        this_lang = "en";
+        for (n1 = 0; n1 < num_lang; n1++) {
+            lang_xx = list_msg00[n1][0];
+            if (lang_xx == this_lang) {
+                ixlang = n1;
+            }
+        }
+    }
+    if (ixlang < 0) { //se neanche en (!? ) allora uso il primo  
+        ixlang = 0;
+        this_lang = list_msg00[0][0];
+    }
+    //console.log("getAllMsgInLang_xx(2  ixlang=" + ixlang);
+    //-----------------------------------
+
+    var msgid, msgtxt;
+
+    n1 = ixlang;
+    lang_xx = list_msg00[n1][0];
+
+    // come separatore di riga è usata la coppia '((' che però deve rimanere e quindi la faccio precedere dal carattere | che uso nello split
+
+    // es. (.122)) riga122 (.123)) riga123
+    // es. caso particolare: "((122)) la riga 122 che finisce con (" + "((123))  riga123" 
+    // es. caso particolare: "((122)) riga 122" + "((123)) ) riga123" che inizia con chiusa parentesi"  
+    // ho sostituito come mark di inizio riga (( con (. 
+    var string_xx = list_msg00[n1][2];
+
+    // tutti i seguenti replace apparenetement inutili, servono se uso google per tradurre i messaggi da una lingua all'altra 
+    string_xx = string_xx.replaceAll("( (", "((").replaceAll("( (", "(("); // elimina spazi fra aperte parentesi ( due volte per eventuali triple parentesiù
+    string_xx = string_xx.replaceAll("( .", "(.").replaceAll("(. ", "(.");
+    string_xx = string_xx.replaceAll(") )", "))").replaceAll(") )", "))"); // elimina spazi fra aperte parentesi ( due volte per eventuali triple parentesi
+    string_xx = string_xx.replaceAll("(((", "( (("); // se 3 parentesi la prima appartiene alla riga precedente, le altre 2 aprono una nuova riga
+    string_xx = string_xx.replaceAll("((.", "( (."); // se 3 parentesi la prima appartiene alla riga precedente, le altre 2 aprono una nuova riga
+    string_xx = string_xx.replaceAll(")))", ")) )"); // se 3 parentesi la prime 2 chiudono il numero riga, la terza è parte della riga
+
+    string_xx = string_xx.replaceAll("(.", "|(.").trim().substring(1); // davanti ad ogni doppia parentesi metto un barra verticale (serve per lo split)
+
+    list_msg_xx = string_xx.split("|");
+
+    var num_elem_xx = list_msg_xx.length;
+
+    list_msg_text = [];
+    list_msg_id = [];
+    for (var k = 0; k < num_elem_xx; k++) {
+        elem_xx = list_msg_xx[k].replaceAll("( .", "(.").replaceAll(") )", "))").trim();
+        msgid = elem_xx.substring(2, 5);
+        msgtxt = elem_xx.substring(7).trim();
+        list_msg_text.push(msgtxt);
+        list_msg_id.push(msgid);
+    }
+
+    set_all_msg();
+
+} //   fine func.  getAllMsgInLang_xx
+//--------------------------------------------
+function text_by_msgid(numid) {
+    var ix = list_msg_id.indexOf(numid);
+
+    if (ix < 0) return "";
+    return list_msg_text[ix];
+}
+//--------------------------------------------
+function text_byid(numid) {
+	return document.getElementById(numid).innerHTML;  
+}
+//--------------------------------------
+function innerHTML_msg(id1, msg_num) {
+    try {
+        document.getElementById(id1).innerHTML = text_by_msgid(msg_num);
+    } catch (er1) {
+        console.log("error in: innerHTML_msg( id1=" + id1 + ", msg_num=" + msg_num + ") \n" + er1);
+    }
+}
+//--------------------------------------------
+function innerHTML_to_from( to_id,  from_id) {
+	 document.getElementById(to_id).innerHTML = document.getElementById(from_id).innerHTML;  
+}
+//---------------------------------------------
+function set_all_msg() {	
+	for (var k = 0; k < list_msg_id.length; k++) {
+        var msgid    = list_msg_id[k];
+        var msgtxt   = list_msg_text[k];
+		var hmsgid   = "m" + msgid;  
+		innerHTML_msg( hmsgid , msgid);
+    }
+	
+	set_msg_no_std_id(); 
+	
+}
+
+//--------------------------------------------
+
+
+
+
+
+
+

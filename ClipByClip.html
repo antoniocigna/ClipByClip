@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="description" content="A tool to practice language comprehension" />
+      <meta name="keywords" content="HTML,CSS,JavaScript, bilingue, video, audio, subtitle,clip" />
+      <meta name="author" content="Antonio Cigna" />
+      <meta name="date" content="May 2021" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Play and Learn clip By Clip</title>
+      <!-- all script group must be together immediately before the style statement -->	  
+      <script >
+         var SECOND_LEVEL = false;   	
+          
+      </script>
+      <script src="scripts/ClipByClip_builder_msg1_messages.jstxt" defer  ></script>		
+      <script src="scripts/ClipByClip_builder_msg2_mger.jstxt"     defer  ></script>	
+      <script src="scripts/ClipByClip_builder_zz_script.jstxt"     defer  ></script>
+      <link rel="stylesheet" href="scripts/ClipByClip_style.css">
+   </head>
+   <body>
+      <div id="id_div10"  style="display:block; height:98%; width:100%; margin:auto; text-align:center;background-color: rgb(0 142 255/52%);" >
+         <div id="id_ch_lang" style="margin:auto; text-align:center;fontSize:2em;" >
+            <input type="radio"  id="r_lingua_it" name="radio_lingua"   onclick='h1_getAllMsgInLang_xx("it"); '>Italiano						
+            <input type="radio"  id="r_lingua_en" name="radio_lingua"   onclick='h1_getAllMsgInLang_xx("en");'>English	
+            <!-- to add o replace a language update the 'SRT_from_TEXT_messages.js'  file                --> 
+         </div>
+         <div id="id_h0"   style="margin:auto; text-align:center;width:100%;">
+            <h1 id="id_h1">Clip By Clip<br><span id="m700">m700 A tool to improve foreign language comprehension</span><br><span id="id_h11">Antonio Cigna 2021</span></h1>
+         </div>
+         <div id="id_div00" class="divPage" style="display: block;">
+            <span id="m701">m701 you can build yourself a local page to play a video or audio file in clips with subtitles on demand</span>
+            <br><br><br>
+            <button  class="button" onclick="h1_hide_show('id_whatneed')" style="width:10rem;">info</button>  
+			
+				<div id="id_whatneed" style="display:none;width:100%;height:50%;">				
+						<!--  <iframe id="id_iframe" src="doc/ClipByClip_description_en.html" title="Info"  style="width:100%;height:100%;"></iframe> -->          
+				</div>
+			
+            <br><br> <br> <br><br>			
+            <button id="butFvideoZ" style="display:block;text-align:center;" class="button" 
+               onclick='
+               document.getElementById("id_file1video").click();						   
+               '>		
+            <span id="m811">Select the Video or Audio file</span>	
+            </button> 
+            <br>
+            <span id="m810">Sono considerati soltanto i file video o audio che  si trovano nella cartella </span>
+         </div>
+         <!--   end div00 -->
+         <div id="id_div13A" class="divPage" style="display: none;">
+            <br>
+            <br><b><span id="m812">VIDEO or Audio file</span></b>  
+            <br>
+            <p id="id_msg13A"  style="font-size:1.3rem;"></p>
+            <div id="id_err_video1">&nbsp;
+            </div>
+            <br><br><br><br>
+            <div  class="divVideo">
+               <video  id="id_video1"  controls  onloadedmetadata="onloaded_fun(this,0.30)"  > 
+               </video>
+               <br>
+            </div>
+            <br><br>
+            <button id="but_titleGet" style="display:none;text-align:center;" class="button" 
+               onclick='
+               h1_get_video_chosen_file2(); 
+               document.getElementById("id_div14").style.display="block";
+               document.getElementById("id_div13A").style.display="none";
+               '>
+            <span id="m814">Confirm</span>
+            </button> 
+            <br>
+            <span id="m807">or</span>
+            <br><br>
+            <div style="text-align:center;">
+               <button id="butFvideo" style="display:block;text-align:center;" class="button" onclick="document.getElementById('id_file1video').click()">
+               <span id="m813">Choose another Video or Audio file in the <b> ClipByClip/VideoAudio</b> folder</span>
+               </button>   
+               <input id="id_file1video" type="file" style="display:none;font-size:1.2rem;width:100%;" 	
+                  onchange='h1_get_video_filename( this );
+                  document.getElementById("but_titleGet").style.display="none";	
+                  document.getElementById("id_ch_lang").style.display="none"; 
+                  document.getElementById("id_h0").style.display="none"; 			
+                  document.getElementById("id_div00").style.display="none";  
+                  document.getElementById("id_div13A").style.display="block";
+                  h1_get_video_chosen_file2();
+                  '>
+            </div>
+         </div>
+         <!--  fine div13A -->	
+         <!--   ==============================================================================  --> 
+         <div id="id_div14"  class="divPage" style="display: none;">
+            <br><br><br>
+            <p id="id_video_fn">
+            <p>
+               <br><br>
+            <div id="id_title1" >
+               <label for="out_title"><b><span id="m703">m703 Write the title</span></b></label><br> <br> 
+               <input id="out_title" type="text"  style="font-size:1.5rem;  height:2.0rem; text-align:center; width:80%;">	
+            </div>
+            <br><br>
+            <button class="button"  id="butFcont2"  
+               onclick="get_title()"	
+               >
+            <span id="m815">Confirm</span>
+            </button> 
+         </div>
+         <!--  fine div14 -->
+         <!--   ==============================================================================  --> 
+         <div id="id_div15"  class="divPage" style="display: none;">
+            <h2  id="id_title15">TITLE</h2>
+            <div id="id_videocopy"  class="divVideo"></div>
+            <br>
+            <div style="text-align:center;margin:auto;font-size:1.2rem;">
+               <br>
+               <table  style="text-align:center;margin:auto;background-color:white;">
+                  <tr>
+                     <td colspan=2><b><span id="m816">Where are the source language subtitles?</span></b></td>
+                  </tr>
+                  <tr>
+                     <td style="width:4rem;"><br>&nbsp;</td>
+                     <td  style="text-align:left;"> 
+                        <input   type="radio" id="id_subhard" name="hardsoft" value="hard">	
+                        <label  for="id_subhard"><span id="m817">The subtitles are hard coded inside the video</span></label>
+                        <br>&nbsp;
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style="width:4rem;"><br>&nbsp;</td>
+                     <td  style="text-align:left;"> 
+                        <input  type="radio" id="id_subsoft" name="hardsoft" value="soft"  checked="checked"> 
+                        <label      for="id_subsoft"><span id="m818">The subtitles are in another file</span></label>
+                        <br>&nbsp;
+                     </td>
+                  </tr>
+               </table>
+            </div>
+            <br>
+            <button class="button"  id="butFcont3"  onclick="h1_check_if_hard_subtitle()"	><span id="m819">Continue</span></button> 
+         </div>
+         <!--  fine div15 -->
+         <!--  ===============================================================================  --> 
+         <!--   inizio div16                          -->
+         <div id="id_div16"  class="divPage" style="display: none;">
+            <h2  id="id_title16">TITLE</h2>
+            <table id="id_table16">
+               <tr>
+                  <th style="width: 50%;" id="m704">m704 Source Language Subtitles</th>
+                  <th style="width: 50%;" id="m705">m705 Translated Subtitles (optional)</th>
+               </tr>
+               <tr>
+                  <td  id="id_up_filetesto1">
+                     <input id="filetesto1" type="file" onchange="h1_fileRead(this,'txt_pagOrig')">					 
+                  </td>
+                  <td>
+                     <input id="filetesto2" type="file" onchange="h1_fileRead(this,'txt_pagTrad')">
+                  </td>
+               </tr>
+               <tr>
+                  <td style="width: 50%;">
+                     <textarea style="display:block;border: 0;" id="txt_pagOrig" rows="20" cols="120" ></textarea>
+                  </td>
+                  <td>
+                     <textarea style="display:block;border: 0;" id="txt_pagTrad" rows="20" cols="120" >
+                     </textarea>
+                  </td>
+               </tr>
+            </table>
+            <br><br>
+            <span id="m867_868">Specifica i file sottotitoli da utilizzare e quindi clicca quì sotto per scaricare
+            i file da usare per riprodurre il file videoaudioTYPE in clip </span>			
+            <br><br>
+            <div id="id_msg16_err" class="c_error" ></div>
+            <button id="match1" class="button" onclick="h1_join_orig_trad()" style="width:20rem;">m706 Ottiene sottotitoli e scrive nuovo file</button>
+            <div id="id_msg16" style="display:none;height:3rem; font-size:2rem;">nome file scritto</div>
+            <br><br>
+            <span id="m718">Devi spostare i 2 file scaricati dalla cartella dei download alla cartella <b>ClipByClip/PLAYER</b></span>  
+         </div>
+         <!-- end div16 -->	
+         <div id="id_div17"  class="divPage" style="display: none;">
+            <div id="id_msg17">end of building</div>
+         </div>
+         <!-- end div17 -->	
+         <br>
+      </div>
+      <!---  end id_div10 -->
+      <!---  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+      <br>
+	  <div id="id_div20" class="divPage" style="display:none; background-color: rgb(0 142 255/52%);">
+         <div id="id_div20s" style="height:80%; border:0px solid red;">
+            <span id="id_video_width"  style="display:none">123</span> 
+            <span id="id_video_height" style="display:none">123</span> 
+            <span id="id_hardsub"      style="display:none">false</span> 	
+            <table style="width:100%; height:100%; padding: 0; margin: auto;border: 0px solid red;">
+               <tbody>
+                  <tr >
+                     <td  id="tdV_left" style="width:20%; border: 0px solid red" class="td1  height_tr1x">
+                        <div>
+                           <span id="m824">Click below to go <b>back</b></span> 								
+                        </div>
+                        <br>
+                        <div id="id_td_prevclips" style="text-align:center;vertical-align:top;">
+                           <span id="m825">di</span>
+                           <input type="number" id="id_prev_clips" value="1" min="0" onchange="h2_update_locstor_value();" style="width:4em;text-align:center;"><br>
+                           <button class="button" style="font-size=1rem; width:8rem;" onclick="h2_playPrevClips(&quot;id_prev_clips&quot;)"><span id="m826">lines</span>
+                           <br><small><small><span id="m827">of subtitles</span></small></small>
+                           </button>
+                           <div><br><span id="m828">or</span><br><br></div>
+                        </div>
+                        <div style="text-align:center;">
+                           <span id="m829">of</span>	
+                           <input type="number" id="id_prev_secs" value="10" min="0" onchange="h2_update_locstor_value();" style="width:4em;text-align:center;"><br>
+                           <button class="button" style="font-size=1rem; width:8rem;" onclick="h2_playPrevSeconds(&quot;id_prev_secs&quot;)"><span id="m831">seconds</span></button>
+                        </div>
+                        <br><br><br>
+                     </td>
+                     <td id="id_td_video" class="td1  height_tr1x" >
+                        <div id="id_head" style="display:block; vertical-align:middle;text-align:center;padding:0.8rem; ">	
+                           <span style="display:none; font-size:0.5rem;text-align:left;" id="m711">Clip By Clip<br></span>	
+                           <span class="c_descr">
+                           <b>Clip By Clip</b>
+                           <br>
+                           <span id="m822_823">per migliorare la comprensione di ascolto e lettura di una lingua straniera</span>
+                           <br>
+                           <br>
+                           </span>
+                           <b><span style="font-size:2rem;" id="id_titolo">m712 titolo</span></b>	
+                           <br> 
+                           <button id="butMagnify" class="button" style="font-size:0.7rem;" onclick="magnifyVideo(this)"  >		
+                           <span id="m872">ingrandisci il video</span>
+                           </button> 
+                        </div>
+						<div id="id_no_sync"  style="display:none;line-height:0.7rem;">&nbsp;</div>
+						<div id="id_sync_staff">
+							<button id="id_syncbut" class="button" style="font-size:0.7rem;" onclick="syncronize_subtitles( &quot;id_sync&quot;)">
+							<span id="m869">clicca quì per spostare il tempo dei sottotitoli di</span>                        
+							</button> 
+							<input id="id_sync" type="text" value="0.0" size="4" style="text-align:center;">
+							<span id="m870" style="font-size:0.7rem;">seconds</span>	
+                        </div>
+						
+						<div id="id_div_video_audio" class="divVideo"> 
+								<video id="myVideo" controls="" onloadedmetadata="onloaded_fun(this,0.40)">
+							     </video>
+							
+							   <table  id="id_dragHardS" class="c_dragMain" style="display: none; padding: 0px; text-align: center; width:100%; background-color: rgb(33, 150, 243); ">
+									<tr>
+									  <td id="id_dragHardS_anchor" class="c_dragAnchor" style="padding: 0px; text-align: center; vertical-align: middle;">  
+										 <span id="m843">Questa striscia serve a coprire i sottotitoli  <br><small>(il pulsante sottotitoli la rende trasparente)</small></span>
+										 <br><small><span id="m844">Per spostarla trascina la parte superiore</span></small>
+										 <br><small><span id="m845">Per modificarne l'ampiezza trascina l'angolo in basso a destra</span></small>
+									  </td>
+								</tr>
+								<tr>
+									<td>
+									  <textarea id="drag_textarea"  rows="1" readonly="" 
+									  style="margin: 0px; padding: 0px; border:0;  background-color: rgb(33, 150, 243); width: 100%;">					  </textarea>
+									  
+									 <!--  rgb(33, 150, 243);   --> 
+									</td>
+								</tr>	
+								</table>
+						</div> 
+						
+						
+                        <div>
+                           <span id="id_time_video"  style="font-size:1rem;"></span>
+                           <br>
+                        </div>
+                        <button id="id_playbut" class="button" style="font-size=1rem; width:8rem;" onclick="h2_replayLastPiece()">
+                        <span id="m832">Repeat<br><small>the last clip </small></span>
+                        </button>
+                     </td>
+                     <td  id="tdV_right" style="width:20%;vertical-align:middle; border: 0px solid red" class="td1  height_tr1x">
+                        <div>
+                           <span id="m834">Click below to go <br>forward</span> 								
+                        </div>
+                        <br>
+                        <div id="id_td_nextclips" style="text-align:center;">
+                           <span id="m836">di</span>
+                           <input type="number" id="id_next_clips" value="1" min="1" onchange="h2_update_locstor_value();" style="width:4em;text-align:center; display:inline;"><br>
+                           <button class="button" style="font-size=1rem; width:8rem;" onclick="h2_playNextClips(&quot;id_next_clips&quot;)">
+                           <span id="m837">lines<small> <small> of subtitles </small> </small></span>
+                           </button>
+                           <div><br><span id="m839">or</span><br><br></div>
+                        </div>
+                        <div style="text-align:center;">
+                           <span id="m840">of</span>									<input type="number" id="id_next_secs" value="10" min="0" onchange="h2_update_locstor_value();" style="width:4em;text-align:center; display:inline;"><br>
+                           <button class="button" style="font-size=1rem; width:8rem;" onclick="h2_playNextSeconds(&quot;id_next_secs&quot;)"><span id="m841">seconds</span>
+                           </button>
+                        </div>
+                        <br><br><br>
+						
+                        <button id="id_playbut2" class="button" style="display:none; font-size=1rem; width:8rem;" onclick="h2_replayLastPiece()">
+                        <span id="m832x">Repeat</span>
+                        </button>
+						<br><br><br>
+						
+						<button id="buttHard" class="button" style="display:none;"font-size=1rem; width:8rem;" onclick="h2_displayOrNot3( 0 )">
+															<span id="m873">Hard subtitles</span>
+						</button>
+						
+                     </td>
+                     <!-- row1-end -->			
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+		  <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx       -->
+		  <div id="id_divdragSub" style="display:block; width:800px; margin:auto; text-align:left; ">
+		 
+            <div id="id_dragSub" class="c_dragMain" style="display:flex;   width:100%;text-align:left;">
+			
+			   <span id="id_dragSub_anchor" class="c_dragAnchor" style="flex:2%; margin:auto; text-align:center; vertical-align:top; border: 2px solid red;">
+                                          <span>⚓</span> <!-- anchor symbol = 9875 -->
+			   </span>
+			   <!-- fine dragSub_anchor  -->	
+				<!--
+			   <button id="id_showHardBut"  class="button" style="display:none; font-size=1rem;  border: 2px solid green;" onclick="h2_displayOrNot3( 0 )">
+                                    <span id="m782H">Sottotitoli originali</span>
+               </button>
+			   -->
+			    <table id="id_tabSub"  style="flex:98%; padding: 0; margin: auto;border: 0px solid blue;">
+			
+                  <tbody>
+                     <tr>
+                        <!-- row2   -->
+                        <td class="td1 height_tr2x">
+                           <table>
+                              <tbody>
+                                 <tr>
+                                    <td id="id_td_subtra2" style="vertical-align:middle;text-align:center;">                                      
+                                       <button class="button" style="font-size=1rem;" onclick="h2_displayOrNot3( 1 )">
+                                       <span id="m783">Sottotitoli tradotti</span>
+                                       </button>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </td>
+                        <td class="td1 height_tr2x"   style="width:75%;" >
+                           <div id="id_sub_filler" style="display:block; vertical-align:middle; text-align:center;font-size:1.4rem;">
+                              <span id="m842">Press the buttons on the left <br> to read <br> here <br> the original and translated subtitles</span>
+                           </div>
+                   
+                           <!--  the 3 subtitle lines   original, silent, translation -->   
+                           <div class="orig_txt bord1" style="display:none;" id="subOrigText2"></div>
+                           <div class="orig_txt" style="display:none;" id="subOrigSilentH">
+                              <span id="subOrigSilent"></span>
+                              <button class="button" style="font-size=1rem; width:8rem;" onclick="h2_skipThisPiece()"><span id="m846">Skip</span></button>						
+                           </div>
+                           <div class="trad_txt bord1" style="display:none;" id="subTradText2"></div>
+                        </td>
+                        <td class="td1 height_tr2x">
+                           <table>
+                              <tr>
+                                 <td id="id_td_suborig2" style="vertical-align:middle;text-align:center;">	
+                                    <button class="button" style="font-size=1rem;" onclick='h2_displayOrNot3( 0 )'>
+                                    <span id="m782">Sottotitoli Originali</span>
+                                    </button>
+                                 </td>
+                              </tr>
+                           </table>
+                        </td>
+                        <!-- row2 end -->
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+      <!--- end of div20 -->
+      <div id="id_msg_depot" style="display:none">
+		<span id="m784">Sottotitoli</span>
+         <span id="m000"></span> 
+         <span id="m708">path completo alla cartella video</span> 
+         <span id="m720">manca il titolo</span> 
+         <span id="m721">il file dei sottotitoli originali non è stato ancora letto oppure è vuoto</span> 
+         <span id="m722"></span> 
+         <span id="m723">Seleziona uno o più file.</span> 
+         <span id="m724">errore1 nel passaggio precedente: riga in formato senza aspetti in extract_time(</span> 
+         <span id="m725">errore2 nel passaggio precedente: riga in formato senza aspetti in extract_time(</span> 
+         <span id="m726">errore3 in extract_time()</span> 
+         <span id="m727">Riproduci fino alla fine</span> 
+         <span id="m730">secondi senza dialogo</span> 
+         <span id="m731">Scarica</span> 
+         <span id="m750">Seleziona uno o più file.</span> 
+         <span id="m752">non può essere riprodotto</span>	
+         <span id="m753">puoi selezionare solo un file che si trova nella<br> <b>stessa cartella del file html</b></span> 
+         <span id="m754">copia il file video o audio nella cartella di questo file html e riprova</span>		
+         <span id="m755">Controlla se il percorso è corretto:</span> 
+         <span id="m706">Ottiene sottotitoli e scrive un nuovo file html</span>   <!--  "match1"         -->
+         <span id="m710">Premi per scaricare</span>   <!--  "write1"         -->
+         <span id="m712">titolo</span>   <!--  "id_titolo"      -->
+         <span id="m717">Premi i pulsanti a sinistra<br>per leggere<br>qui <br>i sottotitoli originali e tradotti</span>   <!--  "id_sub_filler"  -->		
+         <span id="m707">incolla qui l'indirizzo completo della cartella che contiene il video <br>(non è necessario se è la stessa cartella che contiene questo file html)</span>   <!--   NON PIU' USATO     -->
+         <span id="m709">Scegli il file Video o Audio</span>   <!--   NON PIU' USATO     -->
+         <span id="m780">Show</span>	
+         <span id="m781">Hide</span>   	
+         <span id="m801">Each piece of the file with a desired length of up to 1 second,</span>
+         <span id="m802">can be seen or heard over and over again before asking for the original subtitles first and then the translated subtitles.</span>
+         <span id="m803">It is possible to move with the cursor to the desired minute and second and then move back and forth by one piece at a time.</span>
+         <span id="m804">It is possible to skip pieces without dialogue.</span>
+         <span id="m805">Subtitle files must be of type <b>srt</b>, subtitles inserted directly into the video (hardcoded) can also be used.</span> 
+         <span id="m806">what you need</span> 
+         <span id="m820">file name written</span>
+         <span id="m821">final</span>
+         <span id="m850">file type error <br> neither video nor audio</span>
+         <span id="m851">video file name is missing</span>
+         <span id="m852">you can only select a file located in the <b> ClipByClip/VideoAudio</b> folder</span>
+         <span id="m853">copy the video or audio file to this folder and try again<br></span>
+         <span id="m854">(.853) The folder address has not been specified</span>
+         <span id="m855">Select the file again and remember to enter the full address of the folder</span>
+         <span id="m857">the translated text file has not been read or is empty</span>
+         <span id="m858">The construction of the files is finished</span>
+         <span id="m859">move the two downloaded files from the downloads folder to the <b> ClipByClip/PLAYER</b> folder</span>
+         <span id="m860">The <b>ClipByClip</b> folder must contain</span> 
+         <span id="m861">Folder</span>
+         <span id="m862">the file to execute</span>
+         <span id="m863">video or audio to be played</span>
+         <span id="m864">is not a text</span>
+         <span id="m865">is not a text file</span>
+         <span id="m866">all script statement must be together and before the &lt;/head&gt; statement</span>		
+         <span id="m867">Select the subtitles files and then click here below to download the files to play the video clip by clip</span>		
+         <span id="m868">Select the subtitles files and then click here below to download the files to play the audio a piece at time</span>		
+         <span id="m822">(video) To improve understanding of the foreign language, the video can be viewed in small pieces of the desired size Each piece can be viewed and revised several times, with and without subtitles</span>
+         <span id="m823">(audio) To improve understanding of the foreign language, the audio can be ...</span>
+         <span id="m871">hardcoded inside the video file</span>		
+      </div>
+      <div id="id_script_lev2" style="display:none">
+      </div>
+   </body>
+</html>

@@ -1,0 +1,1498 @@
+"use strict";
+
+
+
+var DEBUG = false;  // if true display range of time in the subtitle strings 
+
+
+	
+document.getElementById("id_div20").style.display="block";
+var firstDrag = true;
+var ele_dragHardTexarea = document.getElementById("drag_textarea")
+
+var ele_dragHardS        = document.getElementById("id_dragHardS" ); 
+var ele_dragHardS_anchor = document.getElementById("id_dragHardS_anchor" ); 
+var ele_tabPar_DragHard  =  document.getElementById("id_tabPar_DragHard"); 
+
+var ele_dragSubT         = document.getElementById("id_dragSub" ); 
+var ele_dragSubT_anchor  = document.getElementById("id_dragSub_anchor" ); 
+
+console.log("inizio id_dragSub: " + 	document.getElementById("id_dragSub" ).tagName) 
+
+
+
+
+var wScreen = screen.availWidth  ;
+var hScreen = screen.availHeight ; 
+
+var VIDEO_HEIGHT_PERCENTAGE = 35/100;    // video height percentage over the screen height  
+
+
+var subtitles_delta_time = 0;
+var title1 = document.getElementsByTagName("title")[0].innerHTML
+var src1 = document.getElementById("myVideo").src
+var locNameSubDeltaTime = "subDeltaTime_" + title1.length+"_" + src1.length; 
+
+var vid; 
+
+
+lastClipTimeBegin = 0;
+lastClipTimeEnd = 0; 
+
+
+
+
+var MAX999 =  999999; 
+
+
+var HARD_subtitle = false; 
+
+try {
+	if ( document.getElementById("id_hardsub").innerHTML == "true" )  {  
+			HARD_subtitle = true; 
+			document.getElementById("id_dragHardS").style.display="block"; 	
+	}	
+} catch (e1) {
+}						
+
+	
+
+var script_lev2_str = "";
+var script_lev2_fn = "";
+var script_player_line = "";
+var SILENT_GAP_LIMIT = 1; // > 0    
+
+var out_html_file = "";
+
+var swTranslate = true;
+
+var src_var = "";
+
+var sw_ready_to_write = false;
+var separeX = "§";
+var HTML_TITLE = "";
+
+var path1;
+
+var PLAYER = "Player<br>";
+var sayNODIALOG = "-NODIA-";
+var num = 1;
+
+var HARDCODED = "HARDCODED"; 
+var sw_NO_SUB = false;
+//-------------------------------------------------------	
+
+// var lev2 
+var path1 = window.location.pathname;
+var f1 = path1.lastIndexOf("/");
+var f2 = path1.lastIndexOf("\\");
+var f3 = -1;
+var barra = "/";
+if (f1 > f2) {
+        f3 = f1;
+        barra = "/";
+} else {
+        f3 = f2;
+        barra = "\\";
+}
+
+var id_next_secs_value = 10;
+var id_prev_secs_value = 10;
+
+var id_next_clips_value = 1;
+var id_prev_clips_value = 1;
+
+var lastClipTimeBegin = 0;
+var lastClipTimeEnd = 0;
+
+//var sw_play_step = false;
+var sw_jump = false;
+
+
+
+var ele_time_video = document.getElementById("id_time_video") 
+
+var subFillerElem2 = document.getElementById("id_sub_filler");
+var subOrigElem2 = document.getElementById("subOrigText2");
+var subTradElem2 = document.getElementById("subTradText2");
+var subSilentElem2 = document.getElementById("subOrigSilent");
+var subSilentElem2H = document.getElementById("subOrigSilentH");
+var list_elemSub = [subOrigElem2, subTradElem2];
+
+subFillerElem2.innerHTML = document.getElementById("m717").innerHTML;  //  click on left/right  to read> the original and translated subtitles here   
+
+//document.getElementById("m782x").innerHTML =  document.getElementById("m780").innerHTML;  // 780 show 
+//document.getElementById("m783x").innerHTML =  document.getElementById("m780").innerHTML;  // 780 show 
+
+
+/*
+hideshow = document.getElementById(m_show).innerHTML;  
+msubt =  document.getElementById("m782").innerHTML;  
+document.getElementById("mm782").innerHTML =  "<small>" + hideshow + "</small>" + "<br>" + document.getElementById(m_subt).innerHTML;    
+msubt =  document.getElementById("m783").innerHTML;  
+document.getElementById("mm783").innerHTML =  "<small>" + hideshow + "</small>" + "<br>" + document.getElementById(m_subt).innerHTML;    
+
+*/
+var origFromTimeList = [];
+var origToTimeList = [];
+var origTextList = [];
+
+var tranFromTimeList = [];
+var tranToTimeList = [];
+var tranTextList = [];
+
+
+var isPlaying = false;
+
+//    this is in inline script ==> var SECOND_LEVEL = true;      		 
+
+var righe_lang;
+
+        ready_to_be_played();
+        //leggi_cont_pre();
+        get_orig_tran_text();
+	
+		
+var sw_no_orig_sub = false; 
+var sw_no_tran_sub = false;
+
+if ( origFromTimeList.length < 3) {
+	sw_no_orig_sub=true; 
+	/**
+	if (HARD_subtitle == false) {
+		//document.getElementById("id_td_suborig1").style.display = "none";  
+		document.getElementById("id_td_suborig2").style.display = "none";  
+	}
+	**/
+	document.getElementById("id_td_suborig2").style.display = "none";  
+}
+if (HARD_subtitle) {
+	sw_no_orig_sub=true; 
+} 
+
+
+if ( tranFromTimeList.length < 2) {
+	sw_no_tran_sub=true; 	
+	//document.getElementById("id_td_subtra1").style.display = "none";  
+	document.getElementById("id_td_subtra2").style.display = "none";  
+}
+console.log(" origFromTimeList.length =" + origFromTimeList.length ); 
+console.log("HARD_subtitle=" +  HARD_subtitle + "     " + "sw_no_orig_sub && sw_no_tran_sub=" + sw_no_orig_sub  + " " +  sw_no_tran_sub);
+
+if (HARD_subtitle) {
+	document.getElementById("buttHard").style.display ="block";  
+	//document.getElementById("m782H").innerHTML = document.getElementById("m782").innerHTML ; 
+	//document.getElementById("m782H").innerHTML = verticalText( document.getElementById("m782").innerHTML ); 
+	if (sw_no_orig_sub && sw_no_tran_sub) {	
+		document.getElementById("id_divdragSub"     ).style.display="none";
+	}
+	dragElement( ele_dragHardS,  ele_dragHardS_anchor  );	
+}else {
+	ele_dragHardS.style.display = "none"; 
+}	
+
+console.log(" ele_dragSubT=" +  ele_dragSubT)
+
+if (ele_dragSubT) {
+	if (sw_no_orig_sub && sw_no_tran_sub) {	
+		   //document.getElementById("id_showHardBut").style.display="block";     
+		   
+		   document.getElementById("id_divdragSub"     ).style.display="none";
+		   //document.getElementById("id_tabSub"     ).style.display="none";
+		   //document.getElementById("m782H").innerHTML = document.getElementById("m782").innerHTML; 
+		   ele_dragSubT.style.display ="none"; 
+		   //dragElement( ele_dragSubT ,  ele_dragSubT_anchor   );			
+	} else {
+		dragElement( ele_dragSubT ,  ele_dragSubT_anchor   );
+	}
+}
+
+var sw_clips_yes = true; 
+ 
+if ( sw_no_tran_sub) {
+	if ( sw_no_orig_sub) {
+		sw_clips_yes=false; 
+		document.getElementById("id_sync_staff").style.display ="none";
+		document.getElementById("id_no_sync"   ).style.display ="block";
+	}		
+} 
+if (sw_clips_yes == false) {	
+	document.getElementById("id_td_prevclips").innerHTML = "";  
+	document.getElementById("id_td_nextclips").innerHTML = "" ;  
+}
+
+
+var LIMIT_MIN_TIME_CLIP = 0.100 ;   // if time too near ( difference <  LIMIT_MIN_TIME_CLIP) to toTimeClip than use next clip number 
+
+
+document.getElementById("id_div20").style.display = "block";
+
+
+get_local_storage_value();
+initial_update_delta_time();
+
+console.log( "sw_clips_yes=" + sw_clips_yes)
+
+if (sw_clips_yes == false) {  subFillerElem2.style.display = "none";  }
+
+//-------------------------------
+var MIN_ixClip = MAX999;
+var MAX_ixClip = 0;
+setMinMaxIxClip();
+//--------------------------------
+
+function initial_update_delta_time() {	
+	get_locaStor_delta_time();	
+	document.getElementById("id_sync").value = subtitles_delta_time; 
+	syncronize_subtitles( "id_sync"); 
+}	
+//--------------------------------
+function  hideDisplay3() {
+		/*
+		the hardcoded subtitles are hided by a  mask (  ele_dragHardS +  ele_dragHardTexarea )
+		in order to show them the mask become invisible ( display=none)
+		to hide them the mask become visible ( display = block ) 
+		this process is driven by the button "original subtitles" 
+		*/
+		var numEle=0;
+		var idHideShow = ["m782x", "m783x"][ numEle ] ; 
+		
+		var hideshow ; 
+        if (ele_dragHardS.style.display == "none") {
+				// hide the hard subtitles   ( <-- mask visible  <-- display block)   
+                ele_dragHardS.style.display       = "block";
+				//ele_dragHardTexarea.style.display = "block";
+				//hideshow = document.getElementById("m780").innerHTML;  // msg 780 show
+		} else {
+				// show the hard subtitles  ( <-- mask invisible  <-- display none)   
+                ele_dragHardS.style.display       = "none";
+				//ele_dragHardTexarea.style.display = "none";
+				//hideshow = document.getElementById("m781").innerHTML;  // msg 781 hide
+        }
+		//document.getElementById( idHideShow).innerHTML = hideshow;
+}
+
+//------------------------------------
+//Make the DIV element draggagle:
+var beginPosX = -9999;
+var beginPosY = -9999;
+
+//--------------------------
+//dragElement( ele_dragSubT ,  ele_dragSubT_anchor   );
+//dragElement( ele_dragHardS,  ele_dragHardS_anchor  );
+//-----------------------------------------------------------------
+function dragElement(ele_drag, ele_drag_anchor) {
+		
+		vid = document.getElementById("myVideo");
+		var width2 ;
+		console.log(" dragElement(" + ele_drag.id  + "  firstDrag=" +firstDrag  + " class=" +   ele_drag.className)  
+		
+			if (ele_drag == ele_dragHardS) {
+				console.log(" dragElement(dragdiv) 2 ")  
+				
+				var top_x_video       = document.getElementById("myVideo").offsetTop  ;	
+				var height_x_video    = document.getElementById("myVideo").offsetHeight; 
+				//var left_x_video      = document.getElementById("myVideo").offsetLeft ;  
+				var width_x_video     = document.getElementById("myVideo").offsetWidth;
+				var newTop_drag       = (top_x_video + height_x_video/2).toFixed(0);  
+				
+				var left_x_video = findLeftPos(document.getElementById("id_div20s"), document.getElementById("myVideo") ) ; 
+				console.log("video distance from div20_01 " + left_x_video)
+				
+				
+				console.log(" dragElement(dragdiv 3 ) top_x_video=" + top_x_video + "  height_x_video=" + height_x_video+  " video left=" + left_x_video +			
+							" pre ele .style.top=" + ele_drag.style.top  + " style.left=" + ele_drag.style.left)
+					
+				width2 =  vid.offsetWidth; 				
+				ele_dragHardS.style.top      = newTop_drag   + "px"; 
+				ele_dragHardS.style.left     = (2+1*left_x_video)  + "px"; 
+				ele_dragHardS.style.width    = (2 + 1*width2) + "px";
+				ele_dragHardS_anchor.style.width    = width2 + "px";
+				
+				//ele_tabPar_DragHard.style.width    = (2 + 1*width2) + "px";
+				
+				//console.log(" dragElement(dragdiv 4 ) new .style.top=" + ele_drag.style.top + " left=" + ele_drag.style.left  )
+				
+			} 
+			if (ele_drag.id == "id_dragSub") {
+				console.log(" dragElement(id_dragSub) 2 ")  
+				
+				var ele_20            = document.getElementById("id_div20"); 
+				var left_x_div20      = ele_20.offsetLeft; 
+				var width_x_div20     = ele_20.offsetWidth; 
+				var newLeft           = (left_x_div20).toFixed(0);  
+				console.log("div20 " + " marginleft=" + ele_20.marginLeft + " clientLeft=" + ele_20.clientLeft + " offsetLeft=" +ele_20.offsetLeft  ); 
+				
+				console.log(" dragElement(id_dragSub3 ) left_x_20=" + left_x_div20 + " pre  ele.style.left=" + ele_drag.style.left + " newLeft=" + newLeft )
+				
+				ele_drag.style.left      = (parseFloat(left_x_div20)+10)  + "px"; 
+				ele_drag.style.width     = width_x_div20 + "px"; 
+				
+				console.log(" dragElement(id_dragSub  4 ) new .style.left=" + ele_drag.style.left)
+				
+			} 
+		
+
+        var pos1 = 0,
+                pos2 = 0,
+                pos3 = 0,
+                pos4 = 0;
+				
+        if (ele_drag_anchor) {
+                /* if present, the header is where you move the DIV from:*/
+                ele_drag_anchor.onmousedown = dragMouseDown;
+        } else {
+                /* otherwise, move the DIV from anywhere inside the DIV:*/
+                ele_drag.onmousedown = dragMouseDown;
+        }
+		
+		//console.log(" drag ... " + ele_drag.id + "header    class="   +  document.getElementById(ele_drag.id + "_anchor").className);
+
+        function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                if (beginPosX < 0) {
+                        beginPosX = pos3;
+                        beginPosY = pos4;
+                }
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                if ((pos3 != beginPosX) && (pos4 != beginPosY)) {
+					if (ele_drag.id == "id_dragHardS") {
+                        ele_drag_anchor.innerHTML = "&nbsp;<br>&nbsp;<br>&nbsp;";
+						//ele_drag_anchor.style.width = "10px";
+					}	
+                }
+                // set the element's new position:
+                ele_drag.style.top = (ele_drag.offsetTop - pos2) + "px";
+                ele_drag.style.left = (ele_drag.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+                /* stop moving when mouse button is released:*/
+                document.onmouseup = null;
+                document.onmousemove = null;
+        }
+}
+//------------ end of dragable -----------    
+//-------------------------------------------------
+// find left position of an element from an ancestor 
+function findLeftPos( elem0, ele99) {
+	var pare1; 
+	var elex = ele99;
+	var difftot=0;
+	for(var i=0; i< 99; i++) {		
+		console.log(elex.tagName + " id=" + elex.id + " left=" + elex.offsetLeft); 
+		difftot += elex.offsetLeft; 
+		pare1 = elex.parentElement; 
+		if (pare1) {
+			if (pare1 == elem0) {
+				break; 
+			}
+		} else {
+			break; 
+		}
+		elex = pare1; 
+	}  
+	return difftot; 
+}
+
+
+//-----------------------------------------------------------
+function ready_to_be_played() {
+        //document.getElementById("id_div10").style.display = "none";
+        document.getElementById("id_div20").style.display = "block";
+
+        vid = document.getElementById("myVideo");
+        // Assign an ontimeupdate event to the video element, and execute a function if the current playback position has changed
+        vid.ontimeupdate = function() {
+                updateVideoTime();
+        };
+		
+		/***
+		vid.addEventListener( "loadedmetadata", function (e) {
+					document.getElementById("id_video_width" ).innerHTML = this.videoWidth ;	
+					document.getElementById("id_video_height").innerHTML = this.videoHeight;	
+					
+					// id_video_type
+					vid.width  = this.videoWidth ;	
+					vid.height = this.videoHeight;	
+					
+					modify_video_dimensions(  vid );	
+			}, 
+			false			
+		);
+		***/
+        isPlaying = false;
+
+        // On video playing toggle values
+        vid.onplaying = function() {
+                isPlaying = true;
+        };
+
+        // On video pause toggle values
+        vid.onpause = function() {
+                isPlaying = false;
+        };
+		
+}
+
+//------------------------------------------------------------
+
+function get_orig_tran_text() {
+
+        // var  inp_text_scr   defined inside script  written at first level   // document.getElementById("inp_text").innerHTML;
+
+        inp_text_orig = inp_text_orig.replaceAll('&quot;', '"').replaceAll("&apos;", "'"); // from level1 
+        inp_text_tran = inp_text_tran.replaceAll('&quot;', '"').replaceAll("&apos;", "'"); // from level1 
+
+        var inp_row_orig = inp_text_orig.split("<br>");
+        var inp_row_tran = inp_text_tran.split("<br>");
+        var i, row, rowcol, rowText, rowTime;
+		/*
+        console.log("get_orig_tran_text() " + "len inp_text=" + inp_text_orig.length +
+                " inp_row_orig.length=" +
+                inp_row_orig.length);
+		*/	
+		
+		
+        //-------------------------
+		
+		var from1 = 0, to1 = 0; 
+		
+		origFromTimeList = [];
+		origToTimeList = [];
+		origTextList = [];
+
+		tranFromTimeList = [];
+		tranToTimeList = [];
+		tranTextList = [];
+			
+		origFromTimeList.push( 0   );
+		origToTimeList.push(   0   );
+		origTextList.push(     ""  );
+		
+		for (i = 0; i < inp_row_orig.length; i++) {
+			row = inp_row_orig[i];
+			if (i==0) {				
+				if (row == HARDCODED) { 
+						HARD_subtitle = true; 
+						origFromTimeList.push( 0 );
+						origToTimeList.push(   MAX999 );
+						origTextList.push(HARDCODED);				
+						break; 
+				}		
+			}
+			if (row == "") {
+					continue;
+			}
+			rowcol  = row.split("::");
+			rowText = rowcol[1].trim();
+			rowTime = rowcol[0].split(":");
+			
+			from1   = parseFloat(rowTime[0])			
+			to1     = parseFloat(rowTime[1]); 
+			
+			origFromTimeList.push( from1   );
+			origToTimeList.push(   to1     );
+			origTextList.push(     rowText );
+		}			
+			
+        origFromTimeList.push(MAX999);
+        origToTimeList.push(MAX999);
+        origTextList.push("");
+		//----------------------
+		
+		for(i=0;  i < origFromTimeList.length-1; i++) {
+			origToTimeList[i] = origFromTimeList[i+1] ; 
+		}
+		// now every element ends when the next one starts 
+		
+		//---------------------
+		/*
+		for(i=0;  i < origFromTimeList.length; i++) {
+			if (i > 10) {break;}
+			console.log("srt (" + i + ")  " + origFromTimeList[i] + " - " + origToTimeList[i] + "  " + origTextList[i]);
+		}  	
+		*/
+        //-----------------------------
+		
+		if ( inp_row_tran.length < 2) {
+			//document.getElementById("subTradButt").style.display="none"; 
+			//document.getElementById("m716"       ).style.display="none"; 
+			if ( inp_row_orig.length < 2) {
+				sw_NO_SUB=true;  
+			}
+		} 
+		//--------------------------------------------
+		from1 = 0, to1 = 0; 
+        
+		tranFromTimeList.push( 0   );
+		tranToTimeList.push(   0   );
+		tranTextList.push(     ""  );		
+		
+		for (i = 0; i < inp_row_tran.length; i++) {
+                row = inp_row_tran[i];
+                if (row == "") {
+                        continue;
+                }
+                rowcol = row.split("::");
+				try {
+					rowText = rowcol[1].trim();
+				} catch(e1) {
+					console.log( "get_orig_tran_text() inp_row_tran[" + i + "]=" + row  + " rowcol.length=" +rowcol.length)
+				}
+                rowTime = rowcol[0].split(":");
+				
+				from1   = parseFloat(rowTime[0]);				
+				to1     = parseFloat(rowTime[1]);	
+				
+                tranFromTimeList.push( from1   );
+                tranToTimeList.push(   to1     ); 
+                tranTextList.push(     rowText );
+							
+        }
+        //tranFromTimeList.push(MAX999);
+        //tranToTimeList.push(MAX999);
+        tranTextList.push("");
+		//--------------------------
+		//----------------------
+		
+		for(i=0;  i < tranFromTimeList.length-1; i++) {
+			tranToTimeList[i] = tranFromTimeList[i+1] ; 
+		}
+		// now every element ends when the next one starts 
+		
+        //--------------------
+} // end of 	get_orig_tran_text()
+//-------------------------------------------------------
+
+function syncronize_subtitles( id_sync ) {
+	    var deltaTimeX = document.getElementById(id_sync).value;
+
+		
+		if (isNaN( deltaTimeX )) { return;}		
+		
+		var deltaTime = parseFloat( deltaTimeX ); 
+		
+		if (isNaN( deltaTime )) { return;}
+		
+		//if (deltaTime==0) {return;}
+		
+
+		subtitles_delta_time = deltaTime;
+		
+		update_localStor_delta_time(); 
+		
+		get_orig_tran_text(); 
+		
+		var z;
+		//---
+		for(z=0; z < origFromTimeList.length; z++) {
+			//if (z < 4) {  console.log("\nz=" + z + "  da " + origFromTimeList[z] + "    " + origTextList[z]) };
+			origFromTimeList[z] += deltaTime ; 
+			origToTimeList[z]   += deltaTime ; 
+			//if (z < 4) {  console.log("\t\t" + "  a " + origFromTimeList[z] ) };
+		}	
+		//---
+		for(z=0; z < tranFromTimeList.length; z++) {
+			tranFromTimeList[z] += deltaTime ; 
+			tranToTimeList[z]   += deltaTime ; 
+		} 
+
+
+
+} // end of  syncronize_subtitles 
+
+//-------------------------------------------------------
+
+function updateVideoTime() {
+        set_time_to_show(vid.currentTime);
+}
+//-------------------------------------------------
+//-----------------------------------------------------------
+function set_time_to_show(time_secs) {
+		
+		var msg = ""
+		if ( time_secs > vid.duration) { time_secs = vid.duration; }
+		if ( time_secs < 0) { time_secs = 0; }
+		
+		var hhmmss = new Date( time_secs  * 1000).toISOString().substr(11, 8)	; 
+		
+		var ixClip =  get_group_from_time( time_secs );  
+		
+		msg += hhmmss + " = " + time_secs.toFixed(1) + " " ;   
+		msg += " secondi "; 
+		msg += "&nbsp;&nbsp;&nbsp;&nbsp;" 
+		
+		if ((ixClip >= 0) && (origToTimeList[ ixClip ]  < MAX999)) {
+			msg += " clip " + ixClip; 
+			msg += " (" + origFromTimeList[ ixClip ].toFixed(1) ; 
+			msg += " -  " + origToTimeList[ ixClip ].toFixed(1) ; 	
+			//msg += " " + origTextList[ ixClip ] 	
+			
+			if (subtitles_delta_time != 0) {
+				msg += "&nbsp;" ;
+				if (subtitles_delta_time > 0) {
+					msg += " aumen. " + subtitles_delta_time;   
+				} else {
+					msg += " dimin. " + (0-subtitles_delta_time);   
+				}
+				msg += " secondi";	
+			}
+			msg += ")";	
+		}		
+			
+	
+		ele_time_video.innerHTML =  msg ;		
+
+        setting_sub_of_group3(time_secs);
+}
+
+//-------------------------------
+function setting_sub_of_group3(timeInSeconds) {
+
+		//var sw_spia= ((timeInSeconds >= 5) & (timeInSeconds <42))  
+
+        //if ( timeInSeconds == 7.184759){  console.log("setting_sub_of_group3( " + timeInSeconds  ); }
+        //if ( (timeInSeconds > 7 ) && ( timeInSeconds < 12)) {  console.log("setting_sub_of_group3( " + timeInSeconds  ); }
+        var origIxFromTo = get_ix_from_time(origFromTimeList, origToTimeList, timeInSeconds);
+        var tranIxFromTo = get_ix_from_time(tranFromTimeList, tranToTimeList, timeInSeconds);
+        var origTextX = "",
+                tranTextX = "";
+        var z2;
+		
+		var playClipNum=-1; 
+        //------------
+        if (origIxFromTo[0] >= 0) {
+				playClipNum = origIxFromTo[0]; 
+                //if ( timeInSeconds == 7.184759){console.log("             origIx.. From=" + origIxFromTo[0] +  "   origIx..To=" + origIxFromTo[1]   ) }
+                //if ( (timeInSeconds > 7 ) && ( timeInSeconds < 12) ){console.log("             origIx.. From=" + origIxFromTo[0] +  "   origIx..To=" + origIxFromTo[1]   ) }
+                for (z2 = origIxFromTo[0]; z2 <= origIxFromTo[1]; z2++) {					
+                        if (DEBUG) {
+                                origTextX += "[" + origFromTimeList[z2] + "-" + origToTimeList[z2] + "] ";
+                        }
+                        origTextX += origTextList[z2] + "<br>";
+                }
+				
+				//origTextX = "v=" + vid.currentTime.toFixed(3) + " s" + (origFromTimeList[  origIxFromTo[0] ]).toFixed(3) + " " +  origTextX 
+				
+                subOrigElem2.innerHTML = origTextX; // update only if there is something otherwise  the old content is untouched 	
+        }
+        //-----------
+        if (tranIxFromTo[0] >= 0) {
+				if (playClipNum < 0) {playClipNum = tranIxFromTo[0]; }
+                //if ( timeInSeconds == 7.184759){ console.log("             tranIxIx.. From=" + tranIxFromTo[0] +  "  tranIx..To=" + tranIxFromTo[1]   ) }
+                //if ( (timeInSeconds > 7 ) && ( timeInSeconds < 12)) {console.log("             tranIxIx.. From=" + tranIxFromTo[0] +  "  tranIx..To=" + tranIxFromTo[1]   ) }
+                for (z2 = tranIxFromTo[0]; z2 <= tranIxFromTo[1]; z2++) {
+                        if (DEBUG) {
+                                tranTextX += "[" + tranFromTimeList[z2] + "-" + tranToTimeList[z2] + "] ";
+                        }
+                        tranTextX += tranTextList[z2] + "<br>";
+                }
+                subTradElem2.innerHTML = tranTextX; // update only if there is something otherwise  the old content is untouched 	
+        }
+        //----------------------	
+		/*
+		if (playClipNum < 0) { 
+			document.getElementById("id_playtime2").innerHTML = ""
+		} else {
+			document.getElementById("id_playtime2").innerHTML = "( " + playClipNum + " ) " ; 
+		}
+		*/
+		
+		//if (sw_spia) { console.log( "origTextX="  +  origTextX  +   "    tranTextX="  +  tranTextX); } 
+		
+        if ((origTextX.indexOf(sayNODIALOG) >= 0) || (tranTextX.indexOf(sayNODIALOG) >= 0)) {
+                //console.log("?anto1 nodialog?  " +  origTextX ); 
+				origTextX = origTextX.replace(sayNODIALOG, " ");
+				
+				if ( origTextX.indexOf( HARDCODED ) >=0)  {
+					origTextX = "";
+				}
+				
+                subOrigElem2.innerHTML = origTextX;
+				
+				tranTextX = tranTextX.replace(sayNODIALOG, " ");
+                subTradElem2.innerHTML = tranTextX;
+			    
+				//if (sw_spia) { console.log( "2   " + "origTextX="  +  origTextX  +   "    tranTextX="  +  tranTextX) } 	
+				
+				if (origTextX != "") {
+					subSilentElem2.innerHTML = origTextX;
+				} else {
+					if (tranTextX != "") {
+						subSilentElem2.innerHTML = tranTextX;
+					} else {
+						subSilentElem2.innerHTML=""; 
+					}
+				}
+				//console.log("?anto1 nodialog? 2  subSilentElem2=" +  subSilentElem2.innerHTML ); 
+                subSilentElem2H.style.display = "block";
+                subFillerElem2.style.display = "none";
+                subOrigElem2.innerHTML = "";
+                subTradElem2.innerHTML = "";
+                return;
+        } else {
+                subSilentElem2H.style.display = "none";
+        }
+
+}
+
+if (sw_clips_yes == false) {  subFillerElem2.style.display = "none";  }
+
+
+//----------------------------------------------
+function update_localStor_delta_time() {	 
+	 
+	 if (typeof(Storage) !== "undefined") {
+		localStorage.setItem( locNameSubDeltaTime, subtitles_delta_time);
+	 }
+}
+//----------------------------------------------
+function get_locaStor_delta_time() {
+	
+	 if (typeof(Storage) !== "undefined") {
+	 
+		var newval = localStorage.getItem( locNameSubDeltaTime);  
+		if (newval == null) {
+			localStorage.setItem( locNameSubDeltaTime, subtitles_delta_time);
+		} else {		
+			subtitles_delta_time = parseFloat( newval ) ;   
+		} 		
+	 }
+}
+//-------------------------------
+
+/*
+//----------------------------------------------
+function OLDupdate_localStor_delta_time() {
+	 if (typeof(Storage) !== "undefined") {
+		localStorage.subtitles_delta_time = subtitles_delta_time;
+	 }
+} // end of old 
+//----------------------------------------------
+function OLDget_locaStor_delta_time() {
+	 if (typeof(Storage) !== "undefined") {
+		if (localStorage.subtitles_delta_time) {
+			subtitles_delta_time = parseFloat( localStorage.subtitles_delta_time ) ; 
+		} else {
+			localStorage.subtitles_delta_time = subtitles_delta_time;
+		}		
+	 }
+}  // end of old...
+//-------------------------------
+*/
+//------------------------------------------------------  
+function h2_update_locstor_value() {
+
+		if (sw_clips_yes) {
+			id_next_secs_value  = document.getElementById("id_next_secs" ).value;
+			id_next_clips_value = document.getElementById("id_next_clips").value;
+		}
+		
+        id_prev_secs_value = document.getElementById("id_prev_secs").value;		
+        id_prev_clips_value = document.getElementById("id_prev_clips").value;
+
+        if (typeof(Storage) !== "undefined") {
+                localStorage.stor_id_next_secs_value = id_next_secs_value;
+                localStorage.stor_id_prev_secs_value = id_prev_secs_value;				
+				if (sw_clips_yes) {
+					localStorage.stor_id_next_clips_value = id_next_clips_value;
+					localStorage.stor_id_prev_clips_value = id_prev_clips_value;
+				}
+        }
+}
+
+//-----------------------------------------
+function get_local_storage_value() {
+
+        if (typeof(Storage) !== "undefined") {				
+                if (localStorage.stor_id_next_secs_value) {
+                        id_next_secs_value = localStorage.stor_id_next_secs_value;
+                } else {
+                        localStorage.stor_id_next_secs_value = id_next_secs_value;
+                }
+                if (localStorage.stor_id_prev_secs_value) {
+                        id_prev_secs_value = localStorage.stor_id_prev_secs_value;
+                } else {
+                        localStorage.stor_id_prev_secs_value = id_prev_secs_value;
+                }
+				if (sw_clips_yes) {
+					if (localStorage.stor_id_next_clips_value) {
+							id_next_clips_value = localStorage.stor_id_next_clips_value;
+					} else {
+							localStorage.stor_id_next_clips_value = id_next_clips_value;
+					}
+					if (localStorage.stor_id_prev_clips_value) {
+							id_prev_clips_value = localStorage.stor_id_prev_clips_value;
+					} else {
+							localStorage.stor_id_prev_clips_value = id_prev_clips_value;
+					}
+				}
+        }
+		
+		if ( sw_clips_yes ) {
+			document.getElementById("id_next_clips").value = id_next_clips_value;
+			document.getElementById("id_prev_clips").value = id_prev_clips_value;
+		}
+        document.getElementById("id_next_secs").value  = id_next_secs_value;    
+		document.getElementById("id_prev_secs").value  = id_prev_secs_value;    
+		
+		
+}
+
+//---------------------------------------------------------------
+function clean_text(str1) {
+        var text1 = str1.trim();
+        if (text1.substring(text1.length - 1) == ":") {
+                text1 = text1.substring(0, text1.length - 1).trim();
+                if (text1.substring(text1.length - 1) == ":") {
+                        text1 = text1.substring(0, text1.length - 1).trim();
+                }
+        }
+        return text1;
+}
+
+//---------------------------------------------
+function normalize(riga0) {
+        var riga = riga0;
+        if (riga == "") {
+                return "";
+        }
+        //				  12345678901234567890			
+        for (var z = 1; z < 20; z++) {
+                if (riga.indexOf(": ") < 0) {
+                        break;
+                }
+                riga = riga.replaceAll(": ", ":");
+        }
+        var rigax = (riga + "                    ").replaceAll(":::",
+                ": ::") + "   ::   ::   ::   ::   ::   ::";
+        var riga1 = rigax.substring(0, 20);
+        var riga2 = rigax.substring(20);
+        var riga1x = riga1.replaceAll(",", ".").replaceAll(". ", "."); // only on the beginning to repair timestamp 	
+
+        return riga1x + riga2;
+}
+//--------------------------------------------         
+// Play video function
+function playVid() {
+
+        //console.log("PLAY time=" + vid.currentTime);
+        if (isPlaying) {
+                return;   
+        }
+        if (vid.paused) {
+                vid.play();
+        }
+}
+//-------------------------------------------------
+// Pause video function
+function pauseVid() {
+        //console.log("PAUSE time=" + vid.currentTime);
+		if (vid.paused) {
+			return; 
+		} 
+        if (isPlaying) {
+                vid.pause();
+        }
+}
+
+//-------------------------------------------
+function setMinMaxIxClip() {
+
+		MIN_ixClip = MAX999;
+		MAX_ixClip = 0;
+		
+		var max_ix1=-1, max_ix2 = -1; 
+		var min_ix1=MAX999, min_ix2 = MAX999; 
+		
+		if (origToTimeList.length > 2) {
+			max_ix1 = origToTimeList.length-1; 
+			min_ix1 = 0
+		}
+		if (tranToTimeList.length > 2) {
+			max_ix2 = tranToTimeList.length-1; 
+			min_ix2 = 0; 
+		}
+		MIN_ixClip = Math.min(   min_ix1, min_ix2 );
+		MAX_ixClip = Math.max(   max_ix1, max_ix2 );
+		
+}
+
+//---------------------------------------
+function limit_MinMax_ixClip( ixClip0 ) {
+				
+		if (ixClip0 > MAX_ixClip) { return MAX_ixClip; }
+		if (ixClip0 < MIN_ixClip) { return MIN_ixClip; }
+		
+		return ixClip0  
+		
+}
+
+//----------------------------------
+function max_time_toTimeList( ixClip0 ) { 
+		var to10=-1,  to20 = -1; 
+		
+		if ( ixClip0 <  origToTimeList.length) { to10 = origToTimeList[ ixClip0 ];}
+		
+		if ( ixClip0 < tranToTimeList .length) { to20 = tranToTimeList[ ixClip0 ];}
+		
+		if (to20 > to10) { to10 = to20;}  
+		return to10; 
+}		
+//-------------------------------------------
+function min_time_fromTimeList( ixClip0 ) { 
+		var from10=MAX999,  from20 = MAX999; 
+	
+		if ( ixClip0 <  origFromTimeList.length) { from10 = origFromTimeList[ ixClip0 ];}
+		
+		if ( ixClip0 < tranFromTimeList .length) { from20 = tranFromTimeList[ ixClip0 ];}
+		
+		if (from20 < from10) { from10 = from20;}  
+		return from10; 
+}		
+//---------------------------------------
+function h2_skipThisPiece() {
+
+		/**
+		if (lastClipTimeEnd > 0) {
+			// if the end of the current clip is known,  skip over the end of it 
+			
+			var end2 = lastClipTimeEnd + LIMIT_MIN_TIME_CLIP;
+			if (end2 > vid.duration) { end2 = vid.duration};
+			vid.currentTime = end2;
+			lastClipTimeEnd = 0;
+			//console.log("h2_skipThisPiece 1 " + " lastClipTimeEnd=" + lastClipTimeEnd + "new currenttime=" + vid.currentTime)
+			return 
+		}	
+		**/
+		
+		var nowT = vid.currentTime;
+		var ixClip =  get_group_from_time( nowT ); 
+		
+		/*		
+		var to1 = origToTimeList[ ixClip ]; 
+		var to2=-1; 
+		if ( ixClip < tranToTimeList .length) { to2 = tranToTimeList[ ixClip ];}
+		*/
+		
+		lastClipTimeEnd = max_time_toTimeList( ixClip ); 
+		
+		//console.log("h2_skipThisPiece() 00 " + "  ixClip=" + ixClip + " lastClipTimeEnd=" + lastClipTimeEnd); 
+		
+		
+		if (lastClipTimeEnd < 0) {lastClipTimeEnd=0;}
+		
+		var diff1 = lastClipTimeEnd - nowT;
+		if ( Math.abs(diff1) < LIMIT_MIN_TIME_CLIP ) {  // current time is at the end of the interval 
+			vid.currentTime = lastClipTimeEnd + LIMIT_MIN_TIME_CLIP;
+			//console.log("h2_skipThisPiece 2 " + "ixClip=" + ixClip +  " lastClipTimeEnd=" + lastClipTimeEnd + "new currenttime=" + vid.currentTime)
+			lastClipTimeEnd = 0;
+			
+			return;	
+		}		
+	
+		if (lastClipTimeEnd >=MAX999) { lastClipTimeEnd = vid.duration;   } 
+		try {	
+			vid.currentTime = lastClipTimeEnd;
+		} catch(e1) {
+			console.log("h2_skipThisPiece()" + "  ixClip=" + ixClip + " to1=" + to1 + "  to2=" + to2 + "  lastClipTimeEnd=" + lastClipTimeEnd + "error " + e1); 
+		}
+		
+		//var time1 = new Date( lastClipTimeBegin * 1000).toISOString().substr(11, 8)
+		//var time2 = new Date( lastClipTimeEnd   * 1000).toISOString().substr(11, 8)	
+		//var msg1 = time1 + " - "  + time2
+		
+		//document.getElementById("id_playtime").innerHTML = time2;
+		
+		//console.log("h2_skipThisPiece 3 " + "ixClip=" + ixClip +  " lastClipTimeEnd=" + lastClipTimeEnd + "new currenttime=" + vid.currentTime)
+		
+		lastClipTimeEnd = 0;
+		
+} // end of h2_skipThisPiece()
+//-----------------------------------------
+ 
+function h2_replayLastPiece() {
+		
+		if (lastClipTimeEnd > 0) {	// if the end of the current clip is known,  skip over the end of it 
+			
+			//console.log("?anto1 replayLastPiece() 1 " + "  lastClipTimeBegin=" + lastClipTimeBegin +  " lastClipTimeEnd=" +  lastClipTimeEnd  + " playFromTo(lastClipTimeBegin, lastClipTimeEnd)"   );  	
+			
+			 playFromTo(lastClipTimeBegin, lastClipTimeEnd, 1);
+			 return 
+		}	
+		
+		//console.log("?anto1 replayLastPiece() 2 " + "  lastClipTimeBegin=" + lastClipTimeBegin +  " lastClipTimeEnd=" +  lastClipTimeEnd     );  
+		
+		var nowT   = vid.currentTime;
+		var ixClip = get_group_from_time( nowT,  +1); 
+		//var to1 = origToTimeList[ ixClip ]; 
+		//var to2 = tranToTimeList[ ixClip ];
+		lastClipTimeEnd =  max_time_toTimeList( ixClip ); 
+		
+		/*
+		var from1 = origFromTimeList[ ixClip ]; 
+		var from2 = tranFromTimeList[ ixClip ];
+		if (from1 < 0) {from1 = MAX999;} 
+		if (from2 < 0) {from2 = MAX999;} 
+		*/
+		
+		
+		lastClipTimeBegin = min_time_fromTimeList( ixClip );
+
+		if (lastClipTimeBegin >= MAX999) {lastClipTimeBegin=0;}
+		
+		//console.log("?anto1 replayLastPiece() 3 " + "  lastClipTimeBegin=" + lastClipTimeBegin +  " lastClipTimeEnd=" +  lastClipTimeEnd    + " playFromTo(lastClipTimeBegin, lastClipTimeEnd)"     );  
+        
+		playFromTo(lastClipTimeBegin, lastClipTimeEnd, 2);
+       
+} // end of  h2_replayLastPiece() 
+
+//---------------------------------------------
+
+function h2_playPrevClips(id_prev_clips) {
+
+		list_elemSub[0].style.display = "none";
+		list_elemSub[1].style.display = "none";
+
+		var nowT = vid.currentTime; 
+        var dur_clips = parseFloat(document.getElementById( id_prev_clips ).value);
+		
+		var ixClip =  get_group_from_time( nowT, -1 ); 	
+
+		ixClip = limit_MinMax_ixClip( ixClip ) ;
+		
+		var fromIxClip = limit_MinMax_ixClip( ixClip - dur_clips ) ; 
+		
+		
+	    //var fromTime3 = Math.min( origFromTimeList[fromIxClip]  , tranFromTimeList[fromIxClip] );
+		
+		var fromTime3 = min_time_fromTimeList( fromIxClip ) 
+		
+		if (isNaN( fromTime3)) {
+			console.log("h2_playPrevClips(" + id_prev_clips + ") nowT=" + nowT + " ixClip=" + ixClip + " fromIxClip=" + fromIxClip + 
+				" fromTime3=" + fromTime3 + "  origFromTimeList[fromIxClip]=" + origFromTimeList[fromIxClip] +
+				" tranFromTimeList[fromIxClip]="   +  tranFromTimeList[fromIxClip] ); 
+		} 
+		
+		//console.log("playPrevClips(id_prev_clips=dur_clips=" +  dur_clips + " currenttime=" + vid.currentTime + 
+		//	" ixClip=" + ixClip + " fromIxClip=" + fromIxClip + " fromtime=" + fromTime3 + " toTime=" + origToTimeList[fromIxClip]);
+
+	    //console.log("playFromTo(" + fromTime3 + ",  " + nowT );
+		
+        playFromTo(fromTime3,   nowT, 3 );
+       
+}
+//-------------------------------------------
+function h2_playPrevSeconds(id_prev_secs) {
+
+		list_elemSub[0].style.display = "none";
+		list_elemSub[1].style.display = "none";
+		
+		// play from (id_prev_secs.value)  seconds before the current time
+		
+		var dur_clips = parseFloat(document.getElementById( id_prev_secs).value);		
+		
+		var nowT = vid.currentTime; 
+       
+        var fromTime2   = nowT - dur_clips;
+		
+		if (fromTime2 < 0) { fromTime2=0;}
+		
+		playFromTo(fromTime2, nowT, 4 );
+				
+}
+
+//-------------------------------------------
+function h2_playNextClips(id_next_clips) {
+
+		list_elemSub[0].style.display = "none";
+		list_elemSub[1].style.display = "none";
+
+
+		var dur_clips = parseFloat(document.getElementById( id_next_clips ).value);
+		
+		var fromIxClip =  get_group_from_time(  vid.currentTime, +1 ); 
+		/*
+		if (fromIxClip >= 0) {
+			console.log("playNextClips1 1 " +  id_next_clips + " current: time=" +  vid.currentTime + 
+				" clip="+ fromIxClip + " from " + origFromTimeList[fromIxClip ]+ " to=" + origToTimeList[fromIxClip] ); 
+		} else {
+			console.log("playNextClips1 2 " +  id_next_clips + " current: time=" +  vid.currentTime + 
+				" clip="+ fromIxClip  ); 
+		}
+		*/
+		
+		var toIxClip0   = fromIxClip + dur_clips - 1; 			
+		
+		var toIxClip = limit_MinMax_ixClip( toIxClip0 );  		
+		
+		var toTime3 = max_time_toTimeList( toIxClip );  
+		/*
+		if (vid.currentTime > toTime3) {
+			console.log("playNextClips(id_nextClips => dur_clips=" +  dur_clips + 
+			" ( ERRORE from > to ) " + 
+			" clip=" + fromIxClip + 
+			" toIxClip0=" + toIxClip0  + " toIxClip=" + toIxClip + 
+			" from=currentTime=" +  vid.currentTime + 
+			" toTime=" + toTime3 + " playFromTime(( vid.currentTime, toTime3)");  
+			alert( "ERRORE from > to")
+		}
+		*/
+		
+		playFromTo( vid.currentTime, toTime3, 5);
+	
+       
+}
+//-------------------------------------------
+function h2_playNextSeconds(id_next_secs) {
+		
+		list_elemSub[0].style.display = "none";
+		list_elemSub[1].style.display = "none";
+		
+        var dur_secs = parseFloat(document.getElementById( id_next_secs ).value);
+        var fromTime4 = vid.currentTime;
+        var toTime4  = fromTime4 + dur_secs;	
+		
+		playFromTo(fromTime4, toTime4, 6 );
+		
+}
+//--------------------------
+//------------------------------------------
+function playFromTo(fromTime, toTime, calledBy) {
+
+	if (fromTime > toTime) {
+			console.log("function playFromTo( fromTime=" + fromTime + ", toTime=" + toTime +" calledBy=" + calledBy+ ") 0 " +
+				" ERRORE fromTime>toTime"); 			
+	}
+
+
+	//console.log("function playFromTo( fromTime=" + fromTime + ", toTime=" + toTime +") 0 ") ;
+	if (isNaN(toTime) ) {
+		toTime = fromTime; 
+	} 
+	if ( toTime >=vid.duration) { toTime = vid.duration;} 
+	if ( fromTime < 0) { fromTime = 0;}
+	
+	
+	
+	try {	
+        lastClipTimeBegin = fromTime;
+        lastClipTimeEnd   = toTime;
+		
+	
+		var time1 = new Date( lastClipTimeBegin * 1000).toISOString().substr(11, 8)
+		var time2 = new Date( lastClipTimeEnd   * 1000).toISOString().substr(11, 8)	
+	} catch(e1) {
+		console.log("playFromTo(" + fromTime + ", " +  toTime  +" calledBy=" + calledBy+ ")  " + e1); 
+	}
+	
+	var msg1 = time1 + " - "  + time2;
+	
+	if (time1 > time2) {
+			console.log("function playFromTo( fromTime=" + fromTime + ", toTime=" + toTime +" calledBy=" + calledBy +") 0 " +
+				" ERRORE2 time1=" + time1 + " > " + " time2=" + time2); 			
+	}
+	
+	
+	//if (time2== "13:46:39") {  console.log( "?anto1 time2=" + time2 + " lastClipTimeEnd=" + lastClipTimeEnd );  }
+	
+ 	//document.getElementById("id_playtime").innerHTML = msg1;
+	//document.getElementById("id_playbut").style.display="block"; 
+	
+	//console.log("function playFromTo( fromTime=" + fromTime + ", toTime=" + toTime +" calledBy=" + calledBy +") 1 " +  "msg1=" + msg1) ;	
+		
+        var dur_secs = 1000 * (toTime - fromTime);
+        //console.log("playFromTo(" + fromTime, " , " + toTime  +" calledBy=" + calledBy+") + durata=" + dur_secs)
+        vid.currentTime = fromTime; 
+        var time_secs = vid.currentTime;
+        set_time_to_show(time_secs);
+		
+		//console.log("function playFromTo( fromTime=" + fromTime + ", toTime=" + toTime  +" calledBy=" + calledBy+") 9 " +  " set_time_to_show(time_secs=" + time_secs + "  dur_secs=" + dur_secs) ;	
+
+        playVid(); //   vid.play();
+
+        setTimeout(function() {
+                pauseVid(); //   vid.pause();
+        }, dur_secs);
+		
+}
+
+//--------------------------------------------------------
+function get_ix_from_time(fromTimeList, toTimeList, timeInSeconds) {
+        var ixFrom = -1;
+        var ixTo = -999;
+		if (fromTimeList.length == 0)  {
+				return [ixFrom, ixTo];
+		}
+        /*
+        if ( (timeInSeconds > 7) && ( timeInSeconds < 8))  {
+        	console.log( "zz get_ix_from_time( "+ timeInSeconds + " fromTimeList.length="+	fromTimeList.length+ " toTimeList.length="+	toTimeList.length );  
+        }
+        */
+        for (var z = 0; z < fromTimeList.length; z++) {
+                if (timeInSeconds < fromTimeList[z]) {
+                        break;
+                }
+                if (timeInSeconds > toTimeList[z]) {
+                        continue;
+                }
+                if (ixFrom < 0) {
+                        ixFrom = z;
+                }
+                ixTo = z;
+        }
+        //if ( timeInSeconds == 7.184759){ console.log( "xxx  get_ix_from_time( "+ timeInSeconds + " ==> ixFrom" + ixFrom + " ixTo=" + ixTo) }
+        //if ( (timeInSeconds > 7 ) && ( timeInSeconds < 12)) { console.log( "xxx  get_ix_from_time( "+ timeInSeconds + " ==> ixFrom" + ixFrom + " ixTo=" + ixTo) }
+		
+		//alert("get_ix_from_time("  + fromTimeList.length  + " ixFrom=" + ixFrom + " ixTo=" + ixTo);
+		
+        return [ixFrom, ixTo];
+}
+
+//--------------------------------------------------------
+function get_group_from_time2( fromTimeList,toTimeList, timeInSeconds, moreLess) {
+
+			var ixfrom = -1, diff1=0;
+			
+			for (var z = 0; z < fromTimeList.length; z++) {
+			
+					if (timeInSeconds >= fromTimeList[z]) {		
+						if (timeInSeconds <= toTimeList[z]) {
+							ixfrom = z; 
+							break;
+						}	
+					}					
+					if (timeInSeconds < toTimeList[z]) {
+						break; 
+					} 					
+			}
+			
+			if (ixfrom < 0) {
+				console.log("get_group_from_time2(, ," + timeInSeconds +")  z=" + z +  
+						" fromTimeList["+z+"]=" +fromTimeList[z] + " to ..=" +  toTimeList[z]);
+				return -1;
+			}
+			
+			var toTime   = toTimeList[   ixfrom ];
+			var fromTime = fromTimeList[ ixfrom ];
+		
+			
+		
+			// if current time very near to one of the limits go after it ( moreLess = 1) or before (moreLess = -1)  
+			if ((timeInSeconds >= fromTime) && (timeInSeconds <= toTime)) {
+					if (moreLess > 0) {
+						diff1 = toTime - timeInSeconds;
+						if ( Math.abs(diff1) < LIMIT_MIN_TIME_CLIP ) { ixfrom = ixfrom + 1; }	
+					}
+					if (moreLess < 0) {
+						diff1 = fromTime - timeInSeconds;
+						if ( Math.abs(diff1) < LIMIT_MIN_TIME_CLIP ) { ixfrom = ixfrom - 1; }	
+					}
+					//console.log("  get_group_from_time2( timeInSeconds="  + timeInSeconds + " toTime0" + toTime + " diff1=" + diff1+ " ixfrom=" + ixfrom) 
+					
+					return ixfrom;
+					
+			}	
+			//console.log( "        get_group_from_time2(" + timeInSeconds + " fromtime=" + fromTime + " toTime="+ toTime + " ixfrom= -1"); 
+			return -1;
+}
+
+//-----------------------------------------------------------------
+function get_group_from_time(timeInSeconds, moreLess) {
+		
+		//console.log("xxx  get_group_from_time(timeInSeconds="  + timeInSeconds) 
+		
+		var ixfrom1 = -1, ixfrom2 = -1;
+		/*
+		console.log("        get_group_from_time(" + origFromTimeList.length + " tran=" + tranFromTimeList.length + " " +  tranToTimeList.length)
+		for(var z=0; z < 6; z++) {
+			console.log("        tran from=" + tranFromTimeList[z] + "<-- to=" +  tranToTimeList[z]);
+		
+		} 
+		*/
+		var swerr1=false, swerr2=false; 
+		if (sw_no_orig_sub == false) {	
+				ixfrom1 = get_group_from_time2(origFromTimeList, origToTimeList, timeInSeconds, moreLess) ; 				
+		}
+		if (sw_no_tran_sub == false) {	
+				ixfrom2 = get_group_from_time2(tranFromTimeList, tranToTimeList, timeInSeconds, moreLess) ; 				
+		}
+		if (ixfrom1 < 0) { return ixfrom2; } 
+		if (ixfrom2 < 0) { return ixfrom1; } 
+		
+		return Math.min( ixfrom1, ixfrom2 ) ; 
+		
+		//console.log("   get_group_from_time(timeInSeconds="  + timeInSeconds + "  ixfrom1=" + ixfrom1 + "  ixfrom2=" + ixfrom2 + " ===> ixfrom=" + ixfrom) 
+        //return ixfrom;
+}
+
+//-----------------------------------------------
+function h2_displayOrNot3(numEle) {
+	
+        if (numEle == 0) {
+                if (HARD_subtitle) {
+                        hideDisplay3();
+                        return;
+                }
+        }
+		var idHideShow = ["m782x", "m783x"][ numEle ] 
+		
+        subFillerElem2.style.display = "none";
+		//var hideshow ; 
+        if (list_elemSub[numEle].style.display == "block") {
+                list_elemSub[numEle].style.display = "none";
+				//hideshow = document.getElementById("m780").innerHTML;  // 780 show
+        } else {
+                list_elemSub[numEle].style.display = "block";				
+				//hideshow = document.getElementById("m781").innerHTML;  // 781 hide
+        }
+		//document.getElementById( idHideShow).innerHTML = hideshow;
+		//console.log( "h2_display ... numEle=" + numEle + ", hideshow =" + hideshow); 
+}
+
+
+//------------------------------------------
+
+function modify_video_dimensions( vid ) {	
+			
+			 var vid = document.getElementById("myVideo")  
+			
+			var video_width = vid.width ;	
+			var video_height= vid.height;	
+			var video_height= vid.type;
+		
+		if ((video_height == undefined ) || (video_height < 5 )) {   // audio file  
+				vid.style.width  = "70%"; 
+				vid.style.height = "10%"; 		
+				console.log( "audio??11  video width =" + video_width + "   height=" +  video_height  )		
+				return; 
+			}
+			
+			console.log( "video width =" + video_width + "   height=" +  video_height  )
+			
+			var perc_video_W_on_H = video_width/ video_height; 
+			
+			var newVideoH =  hScreen * VIDEO_HEIGHT_PERCENTAGE; 
+			
+			var newVideoW = newVideoH * perc_video_W_on_H ; 
+			
+			
+			
+			
+			document.getElementById("divdivdrag").style.width = newVideoW + "px"; 
+			document.getElementById("id_dragHardS").style.width = newVideoW + "px" ;   
+			
+			
+			  var vid = document.getElementById("myVideo")  
+			  vid.width = newVideoW; 			  
+			  vid.height= "auto"; 
+
+			
+			console.log( "id_td_video = " + document.getElementById("id_td_video").outerHTML) ; 	
+			
+		} // end of modify_video_dimensions()	  
+
+//--------------------------------------------
+	function magnifyVideo(this1) {
+		
+		this1.parentElement.style.display='none';
+		
+		document.getElementById("id_div_video_audio").style.width = "100%"	; 
+		//document.getElementById("myVideo").style.width = "100%"	; 
+		//document.getElementById("myVideo").style.height= "100%"	;
+		
+		//-----------
+		document.getElementById("id_playbut" ).style.display = "none"; 
+		document.getElementById("id_playbut2").style.display = "block"; 
+        document.getElementById("m832x").innerHTML = document.getElementById("m832").innerHTML 
+		///----
+		document.getElementById("tdV_left" ).style.width="10%" ;
+		document.getElementById("tdV_right").style.width="10%" ; 
+	
+	
+		var height_div20    = document.getElementById("id_div20").offsetHeight; 
+		var width_div20     = document.getElementById("id_div20").offsetWidth; 
+		
+		var maximum_height = (height_div20 * 0.95).toFixed(0); 
+		var maximum_width  = (width_div20  * 0.75).toFixed(0); 
+		
+		
+		var height_x_video  = document.getElementById("myVideo").offsetHeight; 
+		var width_x_video     = document.getElementById("myVideo").offsetWidth;		
+				
+		// 1) firstly set then maximum height	
+		// 2) then reduce if the maximum width is too large 	
+		
+			var new_height_video =  maximum_height; 
+			
+			var perc_rid_h = new_height_video / height_x_video
+			var new_width_video = (width_x_video *  perc_rid_h).toFixed(0); 
+			
+			if (new_width_video > maximum_width ) {
+				var perc_rid_w = maximum_width / new_width_video;
+				new_height_video = new_height_video * perc_rid_w; 
+				new_width_video = maximum_width;
+			}
+			
+			//document.getElementById("myVideo").height       =  new_height_video ; // + "px"; 
+			//document.getElementById("myVideo").width        =  new_width_video ; //  + "px"; 
+			
+			document.getElementById("myVideo").style.height =  new_height_video + "px"; 
+			document.getElementById("myVideo").style.width  =  new_width_video  + "px"; 
+		
+			
+			
+			
+			
+		var top_x_video       = document.getElementById("myVideo").offsetTop  ;	
+		height_x_video        = document.getElementById("myVideo").offsetHeight; 
+		//var left_x_video      = document.getElementById("myVideo").offsetLeft ;  
+		width_x_video         = document.getElementById("myVideo").offsetWidth;
+		var newTop_drag       = (top_x_video + height_x_video/2).toFixed(0);  
+		
+		console.log("magnify2 ... height: scr =" + hScreen + " div20=" + height_div20 + " video=" +  height_x_video)  
+		console.log("magnify2 ... width : scr =" + wScreen + " div20=" + width_div20  + " video=" +  width_x_video )  
+		
+		
+		var left_x_video = findLeftPos(document.getElementById("id_div20s"), document.getElementById("myVideo") ) ; 		
+		
+		console.log("video distance2 from div20_01 " + left_x_video)		
+	
+		ele_dragHardS.style.top      = newTop_drag   + "px"; 
+		ele_dragHardS.style.left     = (2+1*left_x_video)  + "px"; 
+		
+			var width2 =  document.getElementById("myVideo").offsetWidth;  
+		ele_dragHardS.style.width    = (2 + 1*width2) + "px";
+		ele_dragHardS_anchor.style.width    = width2 + "px";
+		ele_dragHardTexarea.style.width    = width2 + "px";
+		
+		
+		
+		
+	}
+//----------------------------------------------	
+function verticalText(text1) {
+	
+	// first letter -> first row, second letter -> second row ... 
+	
+	var text2 = text1.split('').join("<br>"); 
+	return text2;  	
+}
+//-----------------------------
