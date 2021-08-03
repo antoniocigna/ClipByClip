@@ -54,45 +54,14 @@ Scaricare il file video o audio, il file sottotitoli originali ed eventualmente 
 
 Per iniziare eseguire il file **ClipByClip.html**.
 
+
 Cartelle Utilizzate e Loro Contenuto
 ------------------------------------
 
-**ClipByClip** 
-cartella che contiene l'applicazione
-
-  
-
-**ClipByClip.html**
-
-file costruttore (doppio clip per iniziare)
-
- 
-
-**scripts**
-
-cartella che contiene tutti gli script
-
- 
-
-**VideoAudio**
-
-cartella che contiene i file video e audio  
-es. Sherlock Holmes in Dressed to Kill.mp4
-
- 
-
-**PLAYER**
-
-cartella che contiene i file **player**  
-es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html
-
-
-|---|---| 
-|**ClipByClip** :| cartella che contiene l'applicazione:|
-|---:|-------------:|
-| |**ClipByClip.html** | file costruttore (doppio clip per iniziare)|
-| |**scripts**   | cartella che contiene tutti gli script |
-| |**VideoAudio**| cartella che contiene i file video e audio   |
-| |              | es. Sherlock Holmes in Dressed to Kill.mp4
-| |**PLAYER**    | cartella che contiene i file **player**   |
-| |              | es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html |
+|:---|:---- |
+|**ClipByClip.html** | file costruttore (doppio clip per iniziare)|
+|**scripts**   | cartella che contiene tutti gli script |
+|**VideoAudio**| cartella che contiene i file video e audio   |
+|              | es. Sherlock Holmes in Dressed to Kill.mp4
+|**PLAYER**    | cartella che contiene i file **player**   |
+|              | es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html |
