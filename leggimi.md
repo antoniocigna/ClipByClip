@@ -59,7 +59,7 @@ File e Cartelle
 ------------------------------------
 
 | Nome          | Descrizione     |
-| ------------- | -------------|
+| :------------- | :-------------|
 | **ClipByClip.html**  | file costruttore (doppio clip per iniziare) | 
 | **scripts**   | cartella che contiene tutti gli script     |
 | **VideoAudio** | cartella che contiene i file video e audio |  
