@@ -58,10 +58,10 @@ Per iniziare eseguire il file **ClipByClip.html**.
 Cartelle Utilizzate e Loro Contenuto
 ------------------------------------
 
-| --- | ---- |
-|**ClipByClip.html** | file costruttore (doppio clip per iniziare)|
-|**scripts**   | cartella che contiene tutti gli script |
-|**VideoAudio**| cartella che contiene i file video e audio   |
-|              | es. Sherlock Holmes in Dressed to Kill.mp4 |
-|**PLAYER**    | cartella che contiene i file **player**   |
-|              | es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html |
+ --- | ---- 
+**ClipByClip.html** | file costruttore (doppio clip per iniziare)
+**scripts**   | cartella che contiene tutti gli script 
+**VideoAudio**| cartella che contiene i file video e audio   
+              | es. Sherlock Holmes in Dressed to Kill.mp4 
+**PLAYER**    | cartella che contiene i file **player**   
+              | es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html 
