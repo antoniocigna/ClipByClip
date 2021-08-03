@@ -62,9 +62,11 @@ Cartelle Utilizzate e Loro Contenuto
 | Tables        | Are           | Cool  |
 | ------------- |:-------------:| -----:|
 | **ClipByClip.html**  | file costruttore (doppio clip per iniziare) | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-
+| **scripts**   | cartella che contiene tutti gli script     |   $12 |
+| **VideoAudio** | cartella che contiene i file video e audio |    $1 |
+|                |  es. Sherlock Holmes in Dressed to Kill.mp4 |
+| **PLAYER**     |  cartella che contiene i file **player**   |
+|                |  es. ClipByClip\_\_Sherlock Holmes in Dressed to Kill.html |
 
 
  --- | ---- 
