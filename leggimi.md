@@ -58,6 +58,15 @@ Per iniziare eseguire il file **ClipByClip.html**.
 Cartelle Utilizzate e Loro Contenuto
 ------------------------------------
 
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
+
+
  --- | ---- 
 **ClipByClip.html** | file costruttore (doppio clip per iniziare)
 **scripts**   | cartella che contiene tutti gli script 
